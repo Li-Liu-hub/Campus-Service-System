@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${jsyl.datasource.driver-class-name}
+      url: jdbc:mysql://${jsyl.datasource.host}:${jsyl.datasource.port}/${jsyl.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${jsyl.datasource.username}
+      password: ${jsyl.datasource.password}
+  redis:
+    host: ${jsyl.redis.host}
+    port: ${jsyl.redis.port}
+    password: ${jsyl.redis.password}
+    database: ${jsyl.redis.database}
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.jsyl.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      jsyl:
+        mapper: debug
+        service: info
+        controller: info
+
+jsyl:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: itcast
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+    user-secret-key: itheima
+    user-ttl: 7200000
+    user-token-name: authentication
+  alioss:
+    endpoint: ${jsyl.alioss.endpoint}
+    access-key-id: ${jsyl.alioss.access-key-id}
+    access-key-secret: ${jsyl.alioss.access-key-secret}
+    bucket-name: ${jsyl.alioss.bucket-name}
+  wechat:
+    appid: #{sky.wechat.appid}
+    secret: #{sky.wechat.secret}
