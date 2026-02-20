@@ -5,21 +5,26 @@
       <p class="page-subtitle">统一管理所有订单，高效处理业务流程</p>
     </div>
 
-    <el-row :gutter="20" class="stats-row">
-      <el-col :span="6" v-for="stat in orderStats" :key="stat.label">
-        <div class="stat-card" :class="stat.type">
-          <div class="stat-icon">
-            <el-icon :size="28">
-              <component :is="stat.icon" />
-            </el-icon>
+    <!-- 订单统计 - 条状设计 -->
+    <div class="stats-section">
+      <div class="stats-bars">
+        <div class="stat-bar" v-for="stat in orderStats" :key="stat.label">
+          <div class="stat-bar-left">
+            <div class="stat-bar-icon" :class="stat.type">
+              <el-icon :size="24">
+                <component :is="stat.icon" />
+              </el-icon>
+            </div>
+            <div class="stat-bar-info">
+              <div class="stat-bar-label">{{ stat.label }}</div>
+            </div>
           </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ stat.value }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
+          <div class="stat-bar-right">
+            <div class="stat-bar-value">{{ stat.value }}</div>
           </div>
         </div>
-      </el-col>
-    </el-row>
+      </div>
+    </div>
 
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm" class="filter-form">
@@ -571,78 +576,85 @@ onMounted(() => {
   }
 }
 
-.stats-row {
+// 订单统计 - 条状设计
+.stats-section {
   margin-bottom: var(--spacing-xl);
-}
-
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-xl);
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-light);
-  transition: all var(--transition-normal);
   
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+  .stats-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
   }
   
-  &.warning {
-    border-left: 4px solid var(--warning-color);
-    .stat-icon {
-      background: linear-gradient(135deg, #ffd89b, #e6a23c);
+  .stat-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-light);
+    transition: all var(--transition-normal);
+    
+    &:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateX(4px);
     }
-  }
-  
-  &.primary {
-    border-left: 4px solid var(--primary-color);
-    .stat-icon {
-      background: linear-gradient(135deg, #66b1ff, #409eff);
+    
+    .stat-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
     }
-  }
-  
-  &.success {
-    border-left: 4px solid var(--success-color);
-    .stat-icon {
-      background: linear-gradient(135deg, #95d475, #67c23a);
+    
+    .stat-bar-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      
+      &.warning {
+        background: linear-gradient(135deg, #ffd89b, #e6a23c);
+      }
+      
+      &.primary {
+        background: linear-gradient(135deg, #66b1ff, #409eff);
+      }
+      
+      &.success {
+        background: linear-gradient(135deg, #95d475, #67c23a);
+      }
+      
+      &.danger {
+        background: linear-gradient(135deg, #f89898, #f56c6c);
+      }
     }
-  }
-  
-  &.danger {
-    border-left: 4px solid var(--danger-color);
-    .stat-icon {
-      background: linear-gradient(135deg, #f89898, #f56c6c);
+    
+    .stat-bar-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
     }
-  }
-}
-
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--border-radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-
-.stat-content {
-  flex: 1;
-  
-  .stat-value {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.2;
-  }
-  
-  .stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin-top: var(--spacing-xs);
+    
+    .stat-bar-label {
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .stat-bar-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    .stat-bar-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
   }
 }
 

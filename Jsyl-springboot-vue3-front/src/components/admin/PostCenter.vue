@@ -5,52 +5,63 @@
       <p class="page-subtitle">管理社区帖子，维护良好的交流环境</p>
     </div>
 
-    <el-row :gutter="20" class="stats-row">
-      <el-col :xs="12" :sm="6">
-        <div class="stat-card primary">
-          <div class="stat-icon">
-            <el-icon :size="24"><Document /></el-icon>
+    <!-- 帖子统计 - 条状设计 -->
+    <div class="stats-section">
+      <div class="stats-bars">
+        <div class="stat-bar">
+          <div class="stat-bar-left">
+            <div class="stat-bar-icon primary">
+              <el-icon :size="24"><Document /></el-icon>
+            </div>
+            <div class="stat-bar-info">
+              <div class="stat-bar-label">总帖子数</div>
+            </div>
           </div>
-          <div class="stat-content">
-            <div class="stat-value">156</div>
-            <div class="stat-label">总帖子数</div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="12" :sm="6">
-        <div class="stat-card success">
-          <div class="stat-icon">
-            <el-icon :size="24"><ChatDotRound /></el-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">892</div>
-            <div class="stat-label">总评论数</div>
+          <div class="stat-bar-right">
+            <div class="stat-bar-value">156</div>
           </div>
         </div>
-      </el-col>
-      <el-col :xs="12" :sm="6">
-        <div class="stat-card warning">
-          <div class="stat-icon">
-            <el-icon :size="24"><View /></el-icon>
+        <div class="stat-bar">
+          <div class="stat-bar-left">
+            <div class="stat-bar-icon success">
+              <el-icon :size="24"><ChatDotRound /></el-icon>
+            </div>
+            <div class="stat-bar-info">
+              <div class="stat-bar-label">总评论数</div>
+            </div>
           </div>
-          <div class="stat-content">
-            <div class="stat-value">12,580</div>
-            <div class="stat-label">总浏览量</div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="12" :sm="6">
-        <div class="stat-card info">
-          <div class="stat-icon">
-            <el-icon :size="24"><Calendar /></el-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">28</div>
-            <div class="stat-label">今日新增</div>
+          <div class="stat-bar-right">
+            <div class="stat-bar-value">892</div>
           </div>
         </div>
-      </el-col>
-    </el-row>
+        <div class="stat-bar">
+          <div class="stat-bar-left">
+            <div class="stat-bar-icon warning">
+              <el-icon :size="24"><View /></el-icon>
+            </div>
+            <div class="stat-bar-info">
+              <div class="stat-bar-label">总浏览量</div>
+            </div>
+          </div>
+          <div class="stat-bar-right">
+            <div class="stat-bar-value">12,580</div>
+          </div>
+        </div>
+        <div class="stat-bar">
+          <div class="stat-bar-left">
+            <div class="stat-bar-icon info">
+              <el-icon :size="24"><Calendar /></el-icon>
+            </div>
+            <div class="stat-bar-info">
+              <div class="stat-bar-label">今日新增</div>
+            </div>
+          </div>
+          <div class="stat-bar-right">
+            <div class="stat-bar-value">28</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm" class="filter-form">
@@ -88,13 +99,28 @@
 
       <el-table :data="postList" stripe style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="title" label="帖子标题" min-width="250" show-overflow-tooltip>
+        <el-table-column
+          prop="title"
+          label="帖子标题"
+          min-width="250"
+          show-overflow-tooltip
+        >
           <template #default="scope">
             <span class="post-title">{{ scope.row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="发布者ID" width="100" align="center" />
-        <el-table-column prop="viewCount" label="浏览量" width="100" align="center">
+        <el-table-column
+          prop="userId"
+          label="发布者ID"
+          width="100"
+          align="center"
+        />
+        <el-table-column
+          prop="viewCount"
+          label="浏览量"
+          width="100"
+          align="center"
+        >
           <template #default="scope">
             <span class="view-count">
               <el-icon><View /></el-icon>
@@ -102,7 +128,12 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="replyCount" label="评论数" width="100" align="center">
+        <el-table-column
+          prop="replyCount"
+          label="评论数"
+          width="100"
+          align="center"
+        >
           <template #default="scope">
             <span class="reply-count">
               <el-icon><ChatDotRound /></el-icon>
@@ -110,20 +141,40 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="发布时间" width="180" align="center">
+        <el-table-column
+          prop="createTime"
+          label="发布时间"
+          width="180"
+          align="center"
+        >
           <template #default="scope">
             {{ formatTime(scope.row.createTime) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right" align="center">
           <template #default="scope">
-            <el-button type="primary" link size="small" @click="handleViewDetail(scope.row)">
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click="handleViewDetail(scope.row)"
+            >
               查看
             </el-button>
-            <el-button type="primary" link size="small" @click="handleEditPost(scope.row)">
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click="handleEditPost(scope.row)"
+            >
               编辑
             </el-button>
-            <el-button type="danger" link size="small" @click="handleDeletePost(scope.row)">
+            <el-button
+              type="danger"
+              link
+              size="small"
+              @click="handleDeletePost(scope.row)"
+            >
               删除
             </el-button>
           </template>
@@ -145,7 +196,7 @@
 
     <el-dialog
       v-model="dialogVisible"
-      :title="isAdd ? '发布帖子' : (isEdit ? '编辑帖子' : '帖子详情')"
+      :title="isAdd ? '发布帖子' : isEdit ? '编辑帖子' : '帖子详情'"
       width="700px"
       class="post-detail-dialog"
     >
@@ -184,15 +235,17 @@
       </div>
       <template #footer>
         <el-button @click="dialogVisible = false">关闭</el-button>
-        <el-button type="primary" v-if="isEdit" @click="handleSavePost">保存</el-button>
+        <el-button type="primary" v-if="isEdit" @click="handleSavePost"
+          >保存</el-button
+        >
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref, onMounted } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Document,
   ChatDotRound,
@@ -201,19 +254,19 @@ import {
   Search,
   RefreshLeft,
   Plus,
-  User
-} from '@element-plus/icons-vue';
-import type { Post } from '@/types/entities';
-import { getPostPage, publishPost, updatePost, deletePost } from '@/api/post';
+  User,
+} from "@element-plus/icons-vue";
+import type { Post } from "@/types/entities";
+import { getPostPage, publishPost, updatePost, deletePost } from "@/api/post";
 
 const filterForm = ref({
-  keyword: ''
+  keyword: "",
 });
 
 const pagination = ref({
   currentPage: 1,
   pageSize: 10,
-  total: 0
+  total: 0,
 });
 
 const loading = ref(false);
@@ -224,24 +277,26 @@ const isEdit = ref(false);
 const isAdd = ref(false);
 
 const postForm = ref({
-  title: '',
-  content: ''
+  title: "",
+  content: "",
 });
 
 const formatTime = (timeArr: number[] | string | undefined): string => {
-  if (!timeArr) return '-';
-  if (typeof timeArr === 'string') {
-    return timeArr || '-';
+  if (!timeArr) return "-";
+  if (typeof timeArr === "string") {
+    return timeArr || "-";
   }
   if (Array.isArray(timeArr) && timeArr.length >= 6) {
     const [year = 0, month = 1, day = 1, hour = 0, minute = 0] = timeArr;
     const padZero = (num: number): string => {
       const n = Number(num);
-      return isNaN(n) ? '00' : n.toString().padStart(2, '0');
+      return isNaN(n) ? "00" : n.toString().padStart(2, "0");
     };
-    return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hour)}:${padZero(minute)}`;
+    return `${year}-${padZero(month)}-${padZero(day)} ${padZero(
+      hour
+    )}:${padZero(minute)}`;
   }
-  return '-';
+  return "-";
 };
 
 const getPostList = async () => {
@@ -250,14 +305,14 @@ const getPostList = async () => {
     const res = await getPostPage({
       page: pagination.value.currentPage,
       pageSize: pagination.value.pageSize,
-      keyword: filterForm.value.keyword || undefined
+      keyword: filterForm.value.keyword || undefined,
     });
     if (res.data) {
       postList.value = res.data.records || [];
       pagination.value.total = res.data.total || 0;
     }
   } catch (err) {
-    console.error('获取帖子列表失败:', err);
+    console.error("获取帖子列表失败:", err);
   } finally {
     loading.value = false;
   }
@@ -269,7 +324,7 @@ const handleSearch = () => {
 };
 
 const handleReset = () => {
-  filterForm.value = { keyword: '' };
+  filterForm.value = { keyword: "" };
   pagination.value.currentPage = 1;
   getPostList();
 };
@@ -288,7 +343,7 @@ const handleViewDetail = (row: Post) => {
   currentPost.value = row;
   postForm.value = {
     title: row.title,
-    content: row.content
+    content: row.content,
   };
   isEdit.value = false;
   isAdd.value = false;
@@ -299,7 +354,7 @@ const handleEditPost = (row: Post) => {
   currentPost.value = row;
   postForm.value = {
     title: row.title,
-    content: row.content
+    content: row.content,
   };
   isEdit.value = true;
   isAdd.value = false;
@@ -310,32 +365,32 @@ const handleSavePost = async () => {
   try {
     if (isAdd.value) {
       await publishPost(postForm.value);
-      ElMessage.success('发布成功');
+      ElMessage.success("发布成功");
     } else if (isEdit.value && currentPost.value?.id) {
       await updatePost(currentPost.value.id, postForm.value);
-      ElMessage.success('更新成功');
+      ElMessage.success("更新成功");
     }
     dialogVisible.value = false;
     getPostList();
   } catch (err) {
-    console.error('保存帖子失败:', err);
+    console.error("保存帖子失败:", err);
   }
 };
 
 const handleDeletePost = async (row: Post) => {
   if (!row.id) return;
   try {
-    await ElMessageBox.confirm('确定要删除该帖子吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
+    await ElMessageBox.confirm("确定要删除该帖子吗？", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
     });
     await deletePost(row.id);
-    ElMessage.success('删除成功');
+    ElMessage.success("删除成功");
     getPostList();
   } catch (err) {
-    if (err !== 'cancel') {
-      console.error('删除帖子失败:', err);
+    if (err !== "cancel") {
+      console.error("删除帖子失败:", err);
     }
   }
 };
@@ -343,8 +398,8 @@ const handleDeletePost = async (row: Post) => {
 const handleAddPost = () => {
   currentPost.value = null;
   postForm.value = {
-    title: '',
-    content: ''
+    title: "",
+    content: "",
   };
   isEdit.value = true;
   isAdd.value = true;
@@ -365,14 +420,14 @@ onMounted(() => {
 
 .page-header {
   margin-bottom: var(--spacing-xl);
-  
+
   .page-title {
     font-size: var(--font-size-2xl);
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 var(--spacing-xs);
   }
-  
+
   .page-subtitle {
     font-size: var(--font-size-sm);
     color: var(--text-tertiary);
@@ -380,82 +435,88 @@ onMounted(() => {
   }
 }
 
-.stats-row {
+// 帖子统计 - 条状设计
+.stats-section {
   margin-bottom: var(--spacing-xl);
-}
 
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-xl);
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-light);
-  margin-bottom: var(--spacing-lg);
-  transition: all var(--transition-normal);
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+  .stats-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
   }
-  
-  &.primary {
-    border-left: 4px solid var(--primary-color);
-    .stat-icon {
-      color: var(--primary-color);
-      background: rgba(64, 158, 255, 0.1);
-    }
-  }
-  
-  &.success {
-    border-left: 4px solid var(--success-color);
-    .stat-icon {
-      color: var(--success-color);
-      background: rgba(103, 194, 58, 0.1);
-    }
-  }
-  
-  &.warning {
-    border-left: 4px solid var(--warning-color);
-    .stat-icon {
-      color: var(--warning-color);
-      background: rgba(230, 162, 60, 0.1);
-    }
-  }
-  
-  &.info {
-    border-left: 4px solid var(--info-color);
-    .stat-icon {
-      color: var(--info-color);
-      background: rgba(144, 147, 153, 0.1);
-    }
-  }
-}
 
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--border-radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .stat-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-light);
+    transition: all var(--transition-normal);
 
-.stat-content {
-  flex: 1;
-  
-  .stat-value {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.2;
-  }
-  
-  .stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin-top: var(--spacing-xs);
+    &:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateX(4px);
+    }
+
+    .stat-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .stat-bar-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.primary {
+        color: var(--primary-color);
+        background: rgba(64, 158, 255, 0.1);
+      }
+
+      &.success {
+        color: var(--success-color);
+        background: rgba(103, 194, 58, 0.1);
+      }
+
+      &.warning {
+        color: var(--warning-color);
+        background: rgba(230, 162, 60, 0.1);
+      }
+
+      &.info {
+        color: var(--info-color);
+        background: rgba(144, 147, 153, 0.1);
+      }
+    }
+
+    .stat-bar-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .stat-bar-label {
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .stat-bar-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .stat-bar-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
   }
 }
 
@@ -477,7 +538,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .header-title {
     font-size: var(--font-size-base);
     font-weight: 600;
@@ -513,7 +574,7 @@ onMounted(() => {
     padding-top: var(--spacing-lg);
     border-top: 1px solid var(--border-light);
   }
-  
+
   .meta-item {
     display: flex;
     align-items: center;
@@ -533,7 +594,7 @@ onMounted(() => {
   .post-center {
     padding: var(--spacing-md);
   }
-  
+
   .list-header {
     flex-direction: column;
     align-items: flex-start;
