@@ -23,6 +23,16 @@ public class UserVO {
 
     private Integer permission;
 
+    private Integer role;
+
     private String address;
+
+    private Integer campusId;
+
+    private String campusName;
+
+    private String createdAt;
+
+    private Double accountBalance;
 
 }

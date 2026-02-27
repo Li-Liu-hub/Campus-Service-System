@@ -50,7 +50,7 @@
           @click="toggleCollapse"
           class="collapse-btn"
         >
-          <span v-show="!isCollapse">{{ isCollapse ? '展开' : '收起' }}</span>
+          <span v-show="!isCollapse">{{ isCollapse ? "展开" : "收起" }}</span>
         </el-button>
       </div>
     </el-aside>
@@ -59,7 +59,9 @@
       <el-header class="header">
         <div class="header-left">
           <el-breadcrumb separator="/" class="breadcrumb">
-            <el-breadcrumb-item :to="{ path: '/admin/dashboard' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/admin/dashboard' }"
+              >首页</el-breadcrumb-item
+            >
             <el-breadcrumb-item>{{ currentPageTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -70,7 +72,11 @@
             </el-button>
           </el-tooltip>
 
-          <el-badge :value="notificationCount" :hidden="notificationCount === 0" class="notification-badge">
+          <el-badge
+            :value="notificationCount"
+            :hidden="notificationCount === 0"
+            class="notification-badge"
+          >
             <el-tooltip content="消息通知" placement="bottom">
               <el-button circle @click="showNotifications = true">
                 <el-icon><Bell /></el-icon>
@@ -91,10 +97,6 @@
                 <el-dropdown-item command="profile">
                   <el-icon><UserFilled /></el-icon>
                   个人中心
-                </el-dropdown-item>
-                <el-dropdown-item command="settings">
-                  <el-icon><Setting /></el-icon>
-                  账户设置
                 </el-dropdown-item>
                 <el-dropdown-item divided command="logout">
                   <el-icon><SwitchButton /></el-icon>
@@ -145,9 +147,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Odometer,
   House,
@@ -164,8 +166,8 @@ import {
   SwitchButton,
   InfoFilled,
   Warning,
-  SuccessFilled
-} from '@element-plus/icons-vue';
+  SuccessFilled,
+} from "@element-plus/icons-vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -178,21 +180,45 @@ const activeMenu = computed(() => route.path);
 
 const currentPageTitle = computed(() => {
   const titleMap: Record<string, string> = {
-    '/admin/dashboard': '工作台',
-    '/admin/orders': '订单管理',
-    '/admin/posts': '帖子管理',
-    '/admin/users': '用户管理',
-    '/admin/settings': '系统设置',
-    '/admin/logs': '操作日志',
-    '/admin/profile': '个人中心'
+    "/admin/dashboard": "工作台",
+    "/admin/orders": "订单管理",
+    "/admin/posts": "帖子管理",
+    "/admin/users": "用户管理",
+    "/admin/settings": "系统设置",
+    "/admin/logs": "操作日志",
+    "/admin/profile": "个人中心",
   };
-  return titleMap[route.path] || '页面';
+  return titleMap[route.path] || "页面";
 });
 
 const notifications = ref([
-  { id: 1, title: '新订单提醒', desc: '您有3个新订单待处理', time: '5分钟前', type: 'info', icon: InfoFilled, unread: true },
-  { id: 2, title: '系统更新', desc: '系统将于今晚22:00进行维护', time: '1小时前', type: 'warning', icon: Warning, unread: true },
-  { id: 3, title: '订单完成', desc: '订单 ORD20260216001 已完成', time: '2小时前', type: 'success', icon: SuccessFilled, unread: false }
+  {
+    id: 1,
+    title: "新订单提醒",
+    desc: "您有3个新订单待处理",
+    time: "5分钟前",
+    type: "info",
+    icon: InfoFilled,
+    unread: true,
+  },
+  {
+    id: 2,
+    title: "系统更新",
+    desc: "系统将于今晚22:00进行维护",
+    time: "1小时前",
+    type: "warning",
+    icon: Warning,
+    unread: true,
+  },
+  {
+    id: 3,
+    title: "订单完成",
+    desc: "订单 ORD20260216001 已完成",
+    time: "2小时前",
+    type: "success",
+    icon: SuccessFilled,
+    unread: false,
+  },
 ]);
 
 const toggleCollapse = () => {
@@ -213,13 +239,10 @@ const handleMenuSelect = (index: string) => {
 
 const handleUserCommand = (command: string) => {
   switch (command) {
-    case 'profile':
-      router.push('/admin/profile');
+    case "profile":
+      router.push("/admin/profile");
       break;
-    case 'settings':
-      router.push('/admin/settings');
-      break;
-    case 'logout':
+    case "logout":
       handleLogout();
       break;
   }
@@ -227,21 +250,23 @@ const handleUserCommand = (command: string) => {
 
 const handleLogout = async () => {
   try {
-    await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
+    await ElMessageBox.confirm("确定要退出登录吗？", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
     });
     localStorage.clear();
-    ElMessage.success('退出登录成功');
-    router.push('/login');
-  } catch {
-  }
+    ElMessage.success("退出登录成功");
+    router.push("/login");
+  } catch {}
 };
 
-watch(() => route.path, () => {
-  window.scrollTo(0, 0);
-});
+watch(
+  () => route.path,
+  () => {
+    window.scrollTo(0, 0);
+  }
+);
 </script>
 
 <style lang="scss">
@@ -324,7 +349,11 @@ watch(() => route.path, () => {
   }
 
   .el-menu-item.is-active {
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-active)) !important;
+    background: linear-gradient(
+      90deg,
+      var(--primary-color),
+      var(--primary-active)
+    ) !important;
     color: #fff;
     box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
   }
@@ -422,7 +451,11 @@ watch(() => route.path, () => {
   }
 
   .user-avatar {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-active));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-active)
+    );
   }
 
   .user-name {
@@ -459,7 +492,7 @@ watch(() => route.path, () => {
       background: rgba(64, 158, 255, 0.05);
 
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         left: 0;
         top: 0;

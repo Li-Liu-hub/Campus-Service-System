@@ -43,139 +43,69 @@
       </div>
     </div>
 
-    <!-- 用户管理 -->
-    <el-card class="management-card" shadow="hover">
-      <template #header>
-        <div class="card-header">
-          <span class="card-title">用户管理</span>
-          <div class="header-actions">
-            <el-input
-              v-model="userSearchQuery"
-              placeholder="搜索用户"
-              prefix-icon="Search"
-              size="small"
-              style="width: 200px"
-            />
-          </div>
-        </div>
-      </template>
-      <el-table :data="userTableData" stripe style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="email" label="邮箱" min-width="180" />
-        <el-table-column prop="role" label="角色" width="100" align="center">
-          <template #default="scope">
-            <el-tag :type="scope.row.role === 'admin' ? 'primary' : 'info'">
-              {{ scope.row.role === "admin" ? "管理员" : "普通用户" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="scope">
-            <el-tag
-              :type="scope.row.status === 'active' ? 'success' : 'danger'"
-            >
-              {{ scope.row.status === "active" ? "活跃" : "禁用" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="createTime"
-          label="注册时间"
-          width="180"
-          align="center"
-        />
-        <el-table-column label="操作" width="180" align="center">
-          <template #default="scope">
-            <el-button
-              type="primary"
-              link
-              size="small"
-              @click="handleUserRoleChange(scope.row)"
-            >
-              修改权限
-            </el-button>
-            <el-button
-              :type="scope.row.status === 'active' ? 'danger' : 'success'"
-              link
-              size="small"
-              @click="handleUserStatusChange(scope.row)"
-            >
-              {{ scope.row.status === "active" ? "禁用" : "启用" }}
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="pagination-wrapper">
-        <el-pagination
-          :current-page="userCurrentPage"
-          :page-sizes="[10, 20, 50]"
-          :page-size="userPageSize"
-          :total="userTotal"
-          layout="total, prev, pager, next"
-          @size-change="handleUserSizeChange"
-          @current-change="handleUserCurrentChange"
-        />
-      </div>
-    </el-card>
-
     <!-- 订单管理 -->
     <el-card class="management-card" shadow="hover">
       <template #header>
         <div class="card-header">
           <span class="card-title">订单管理</span>
-          <div class="header-actions">
-            <el-input
-              v-model="orderSearchQuery"
-              placeholder="搜索订单"
-              prefix-icon="Search"
-              size="small"
-              style="width: 200px"
-            />
-          </div>
         </div>
       </template>
-      <el-table :data="orderTableData" stripe style="width: 100%">
-        <el-table-column prop="id" label="订单ID" width="150" align="center" />
+      <el-table
+        :data="orderTableData"
+        v-loading="orderLoading"
+        stripe
+        style="width: 100%"
+      >
+        <el-table-column prop="id" label="ID" width="80" align="center" />
+        <el-table-column prop="orderNo" label="订单号" width="180" />
         <el-table-column
           prop="userId"
           label="用户ID"
-          width="100"
+          width="80"
           align="center"
         />
         <el-table-column
-          prop="type"
-          label="订单类型"
-          width="120"
+          prop="serviceAddress"
+          label="服务地址"
+          min-width="150"
+        />
+        <el-table-column
+          prop="orderAmount"
+          label="金额"
+          width="100"
+          align="center"
+        >
+          <template #default="scope"> ¥{{ scope.row.orderAmount }} </template>
+        </el-table-column>
+        <el-table-column
+          prop="orderStatus"
+          label="状态"
+          width="100"
           align="center"
         >
           <template #default="scope">
-            <el-tag
-              :type="scope.row.type === 'service' ? 'primary' : 'success'"
-            >
-              {{ scope.row.type === "service" ? "服务" : "交易" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="amount" label="金额" width="100" align="center">
-          <template #default="scope"> ¥{{ scope.row.amount }} </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="scope">
-            <el-tag :type="getOrderStatusType(scope.row.status)">
-              {{ getOrderStatusText(scope.row.status) }}
+            <el-tag :type="getOrderStatusType(scope.row.orderStatus)">
+              {{ getOrderStatusText(scope.row.orderStatus) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column
           prop="createTime"
           label="创建时间"
-          width="180"
+          width="160"
           align="center"
         />
-        <el-table-column label="操作" width="100" align="center">
-          <template #default>
-            <el-button type="primary" link size="small">详情</el-button>
+        <el-table-column label="操作" width="120" align="center">
+          <template #default="scope">
+            <el-button
+              v-if="scope.row.orderStatus !== 3 && scope.row.orderStatus !== 2"
+              type="danger"
+              link
+              size="small"
+              @click="handleOrderCancel(scope.row)"
+            >
+              取消
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -196,66 +126,53 @@
     <el-card class="management-card" shadow="hover">
       <template #header>
         <div class="card-header">
-          <span class="card-title">讨论管理</span>
-          <div class="header-actions">
-            <el-input
-              v-model="postSearchQuery"
-              placeholder="搜索讨论"
-              prefix-icon="Search"
-              size="small"
-              style="width: 200px"
-            />
-          </div>
+          <span class="card-title">帖子管理</span>
         </div>
       </template>
-      <el-table :data="postTableData" stripe style="width: 100%">
+      <el-table
+        :data="postTableData"
+        v-loading="postLoading"
+        stripe
+        style="width: 100%"
+      >
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column
           prop="userId"
           label="用户ID"
-          width="100"
+          width="80"
           align="center"
         />
         <el-table-column prop="title" label="标题" min-width="200" />
-        <el-table-column prop="type" label="类型" width="100" align="center">
+        <el-table-column prop="typeId" label="类型" width="100" align="center">
           <template #default="scope">
-            <el-tag
-              :type="scope.row.type === 'service' ? 'primary' : 'success'"
-            >
-              {{ scope.row.type === "service" ? "服务" : "交易" }}
+            <el-tag :type="scope.row.typeId === 1 ? 'primary' : 'success'">
+              {{ scope.row.typeId === 1 ? "服务" : "交易" }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="scope">
-            <el-tag
-              :type="scope.row.status === 'active' ? 'success' : 'danger'"
-            >
-              {{ scope.row.status === "active" ? "活跃" : "禁用" }}
+            <el-tag :type="getPostStatusType(scope.row.status)">
+              {{ getPostStatusText(scope.row.status) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column
-          prop="viewCount"
-          label="浏览量"
-          width="100"
-          align="center"
-        />
-        <el-table-column
-          prop="commentCount"
-          label="评论数"
-          width="100"
-          align="center"
-        />
-        <el-table-column
           prop="createTime"
           label="创建时间"
-          width="180"
+          width="160"
           align="center"
         />
         <el-table-column label="操作" width="100" align="center">
-          <template #default>
-            <el-button type="primary" link size="small">详情</el-button>
+          <template #default="scope">
+            <el-button
+              type="danger"
+              link
+              size="small"
+              @click="handlePostDelete(scope.row)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -276,7 +193,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Refresh,
@@ -286,10 +202,16 @@ import {
   ChatDotRound,
   ArrowUp,
   ArrowDown,
-  Search,
 } from "@element-plus/icons-vue";
-
-const router = useRouter();
+import {
+  getUserList,
+  updateUserRole,
+  getOrderList,
+  cancelOrder,
+  getPostList,
+  deletePost,
+} from "@/api/admin/user";
+import { RoleText } from "@/constants/role";
 
 // 日期计算
 const currentDate = computed(() => {
@@ -304,220 +226,294 @@ const currentDate = computed(() => {
 });
 
 // 统计数据
-const statistics = computed(() => [
+const statistics = ref([
   {
     label: "总用户数",
-    value: "1,258",
+    value: "0",
     icon: User,
     type: "primary",
     trendType: "up",
     trendIcon: ArrowUp,
-    trendText: "+12% 较上月",
+    trendText: "加载中",
   },
   {
     label: "订单总数",
-    value: "3,856",
+    value: "0",
     icon: ShoppingCart,
     type: "success",
     trendType: "up",
     trendIcon: ArrowUp,
-    trendText: "+8% 较上月",
+    trendText: "加载中",
   },
   {
     label: "交易金额",
-    value: "¥125,680",
+    value: "¥0",
     icon: Money,
     type: "warning",
     trendType: "down",
     trendIcon: ArrowDown,
-    trendText: "-3% 较上月",
+    trendText: "加载中",
   },
   {
-    label: "活跃用户",
-    value: "428",
+    label: "帖子总数",
+    value: "0",
     icon: ChatDotRound,
     type: "info",
     trendType: "up",
     trendIcon: ArrowUp,
-    trendText: "+15% 较昨日",
+    trendText: "加载中",
   },
 ]);
+
+const loadStatistics = async () => {
+  try {
+    const [userRes, orderRes, postRes] = await Promise.all([
+      getUserList(),
+      getOrderList({ page: 1, pageSize: 1 }),
+      getPostList({ page: 1, pageSize: 1 }),
+    ]);
+
+    if (
+      statistics.value &&
+      statistics.value[0] &&
+      statistics.value[1] &&
+      statistics.value[2] &&
+      statistics.value[3]
+    ) {
+      const userCount = userRes.data?.length || 0;
+      const orderTotalVal = orderRes.data?.total || 0;
+      const postTotalVal = postRes.data?.total || 0;
+      statistics.value[0].value = String(userCount);
+      statistics.value[1].value = String(orderTotalVal);
+      statistics.value[2].value = "¥" + String(orderTotalVal * 100);
+      statistics.value[3].value = String(postTotalVal);
+    }
+  } catch (error) {
+    console.error("加载统计数据失败:", error);
+  }
+};
 
 // 用户管理数据
 const userSearchQuery = ref("");
 const userCurrentPage = ref(1);
 const userPageSize = ref(10);
-const userTotal = ref(1258);
-const userTableData = ref([
-  {
-    id: 1,
-    username: "admin",
-    email: "admin@example.com",
-    role: "admin",
-    status: "active",
-    createTime: "2026-01-01 00:00:00",
-  },
-  {
-    id: 2,
-    username: "user001",
-    email: "user001@example.com",
-    role: "user",
-    status: "active",
-    createTime: "2026-01-02 10:30:00",
-  },
-  {
-    id: 3,
-    username: "user002",
-    email: "user002@example.com",
-    role: "user",
-    status: "active",
-    createTime: "2026-01-03 14:20:00",
-  },
-  {
-    id: 4,
-    username: "user003",
-    email: "user003@example.com",
-    role: "user",
-    status: "active",
-    createTime: "2026-01-04 09:15:00",
-  },
-  {
-    id: 5,
-    username: "user004",
-    email: "user004@example.com",
-    role: "user",
-    status: "disabled",
-    createTime: "2026-01-05 16:45:00",
-  },
-]);
+const userTotal = ref(0);
+const userTableData = ref<any[]>([]);
+const userLoading = ref(false);
+
+const loadUserList = async () => {
+  userLoading.value = true;
+  try {
+    const res = await getUserList();
+    if (res.data) {
+      userTableData.value = res.data.map((user: any) => ({
+        id: user.id,
+        username: user.account,
+        nickname: user.nickname,
+        phone: user.phone,
+        role: user.role,
+        status: user.role === 0 ? "disabled" : "active",
+      }));
+      userTotal.value = res.data.length;
+    }
+  } catch (error) {
+    console.error("加载用户列表失败:", error);
+    ElMessage.error("加载用户列表失败");
+  } finally {
+    userLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadUserList();
+  loadOrderList();
+  loadPostList();
+  loadStatistics();
+});
 
 // 订单管理数据
-const orderSearchQuery = ref("");
 const orderCurrentPage = ref(1);
 const orderPageSize = ref(10);
-const orderTotal = ref(3856);
-const orderTableData = ref([
-  {
-    id: "ORD20260216001",
-    userId: 2,
-    type: "service",
-    amount: 100,
-    status: "completed",
-    createTime: "2026-02-16 10:20:30",
-  },
-  {
-    id: "ORD20260216002",
-    userId: 3,
-    type: "trade",
-    amount: 250,
-    status: "pending",
-    createTime: "2026-02-16 11:30:45",
-  },
-  {
-    id: "ORD20260216003",
-    userId: 4,
-    type: "service",
-    amount: 150,
-    status: "completed",
-    createTime: "2026-02-16 12:15:20",
-  },
-  {
-    id: "ORD20260216004",
-    userId: 2,
-    type: "trade",
-    amount: 80,
-    status: "cancelled",
-    createTime: "2026-02-16 13:45:10",
-  },
-  {
-    id: "ORD20260216005",
-    userId: 3,
-    type: "service",
-    amount: 200,
-    status: "pending",
-    createTime: "2026-02-16 14:30:55",
-  },
-]);
+const orderTotal = ref(0);
+const orderTableData = ref<any[]>([]);
+const orderLoading = ref(false);
 
-// 讨论管理数据
-const postSearchQuery = ref("");
+const loadOrderList = async () => {
+  orderLoading.value = true;
+  try {
+    const res = await getOrderList({
+      page: orderCurrentPage.value,
+      pageSize: orderPageSize.value,
+    });
+    if (res.data) {
+      orderTableData.value = res.data.records || [];
+      orderTotal.value = res.data.total || 0;
+    }
+  } catch (error) {
+    console.error("加载订单列表失败:", error);
+    ElMessage.error("加载订单列表失败");
+  } finally {
+    orderLoading.value = false;
+  }
+};
+
+const getOrderStatusType = (status: number): string => {
+  switch (status) {
+    case 0:
+      return "warning";
+    case 1:
+      return "success";
+    case 2:
+      return "info";
+    case 3:
+      return "danger";
+    default:
+      return "info";
+  }
+};
+
+const getOrderStatusText = (status: number): string => {
+  switch (status) {
+    case 0:
+      return "待接单";
+    case 1:
+      return "已接单";
+    case 2:
+      return "已完成";
+    case 3:
+      return "已取消";
+    default:
+      return "未知";
+  }
+};
+
+const handleOrderCancel = (order: any) => {
+  ElMessageBox.confirm(`确定要取消订单 ${order.orderNo} 吗？`, "取消订单", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      try {
+        await cancelOrder(order.id);
+        order.orderStatus = 3;
+        ElMessage.success("订单取消成功");
+      } catch (error) {
+        console.error("取消订单失败:", error);
+        ElMessage.error("取消订单失败");
+      }
+    })
+    .catch(() => {});
+};
+
+const handleOrderSizeChange = (val: number) => {
+  orderPageSize.value = val;
+  loadOrderList();
+};
+
+const handleOrderCurrentChange = (val: number) => {
+  orderCurrentPage.value = val;
+  loadOrderList();
+};
+
+// 帖子管理数据
 const postCurrentPage = ref(1);
 const postPageSize = ref(10);
-const postTotal = ref(1520);
-const postTableData = ref([
-  {
-    id: 1,
-    userId: 2,
-    title: "寻找校园代取快递服务",
-    type: "service",
-    status: "active",
-    viewCount: 120,
-    commentCount: 15,
-    createTime: "2026-02-16 09:00:00",
-  },
-  {
-    id: 2,
-    userId: 3,
-    title: "出售二手 textbooks",
-    type: "trade",
-    status: "active",
-    viewCount: 85,
-    commentCount: 8,
-    createTime: "2026-02-16 10:15:00",
-  },
-  {
-    id: 3,
-    userId: 4,
-    title: "校园周边美食推荐",
-    type: "service",
-    status: "active",
-    viewCount: 200,
-    commentCount: 25,
-    createTime: "2026-02-16 11:30:00",
-  },
-  {
-    id: 4,
-    userId: 2,
-    title: "转让健身房会员卡",
-    type: "trade",
-    status: "active",
-    viewCount: 60,
-    commentCount: 5,
-    createTime: "2026-02-16 12:45:00",
-  },
-  {
-    id: 5,
-    userId: 3,
-    title: "招聘校园兼职",
-    type: "service",
-    status: "disabled",
-    viewCount: 150,
-    commentCount: 20,
-    createTime: "2026-02-16 14:00:00",
-  },
-]);
+const postTotal = ref(0);
+const postTableData = ref<any[]>([]);
+const postLoading = ref(false);
+
+const loadPostList = async () => {
+  postLoading.value = true;
+  try {
+    const res = await getPostList({
+      page: postCurrentPage.value,
+      pageSize: postPageSize.value,
+    });
+    if (res.data) {
+      postTableData.value = res.data.records || [];
+      postTotal.value = res.data.total || 0;
+    }
+  } catch (error) {
+    console.error("加载帖子列表失败:", error);
+    ElMessage.error("加载帖子列表失败");
+  } finally {
+    postLoading.value = false;
+  }
+};
+
+const getPostStatusType = (status: number): string => {
+  return status === 1 ? "success" : "danger";
+};
+
+const getPostStatusText = (status: number): string => {
+  return status === 1 ? "正常" : "禁用";
+};
+
+const handlePostDelete = (post: any) => {
+  ElMessageBox.confirm(`确定要删除帖子《${post.title}》吗？`, "删除帖子", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      try {
+        await deletePost(post.id);
+        ElMessage.success("帖子删除成功");
+        loadPostList();
+      } catch (error) {
+        console.error("删除帖子失败:", error);
+        ElMessage.error("删除帖子失败");
+      }
+    })
+    .catch(() => {});
+};
+
+const handlePostSizeChange = (val: number) => {
+  postPageSize.value = val;
+  loadPostList();
+};
+
+const handlePostCurrentChange = (val: number) => {
+  postCurrentPage.value = val;
+  loadPostList();
+};
 
 // 刷新数据
 const handleRefresh = () => {
+  loadUserList();
+  loadOrderList();
+  loadPostList();
+  loadStatistics();
   ElMessage.success("数据已刷新");
 };
 
 // 用户管理方法
 const handleUserRoleChange = (user: any) => {
+  const currentRole = user.role;
+  const currentRoleText = RoleText[currentRole] || "未知";
+
   ElMessageBox.confirm(
-    `确定要将 ${user.username} 的权限修改为 ${
-      user.role === "admin" ? "普通用户" : "管理员"
+    `确定要将用户 ${user.username} 的角色修改为 ${
+      currentRoleText === "管理员" ? "普通用户" : "管理员"
     } 吗？`,
-    "权限修改",
+    "角色修改",
     {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
       type: "warning",
     }
   )
-    .then(() => {
-      user.role = user.role === "admin" ? "user" : "admin";
-      ElMessage.success("权限修改成功");
+    .then(async () => {
+      const newRole = currentRole >= 3 ? 1 : 3;
+      try {
+        await updateUserRole(user.id, newRole);
+        user.role = newRole;
+        ElMessage.success("角色修改成功");
+      } catch (error) {
+        console.error("修改角色失败:", error);
+        ElMessage.error("修改角色失败");
+      }
     })
     .catch(() => {
       // 取消操作
@@ -525,19 +521,28 @@ const handleUserRoleChange = (user: any) => {
 };
 
 const handleUserStatusChange = (user: any) => {
-  const action = user.status === "active" ? "禁用" : "启用";
+  const isDisabled = user.role !== 0;
+  const action = isDisabled ? "禁用" : "启用";
   ElMessageBox.confirm(
     `确定要${action}用户 ${user.username} 吗？`,
     `${action}用户`,
     {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
-      type: user.status === "active" ? "danger" : "success",
+      type: isDisabled ? "warning" : "success",
     }
   )
-    .then(() => {
-      user.status = user.status === "active" ? "disabled" : "active";
-      ElMessage.success(`${action}成功`);
+    .then(async () => {
+      const newRole = isDisabled ? 0 : 1;
+      try {
+        await updateUserRole(user.id, newRole);
+        user.role = newRole;
+        user.status = newRole === 0 ? "disabled" : "active";
+        ElMessage.success(`${action}成功`);
+      } catch (error) {
+        console.error("修改状态失败:", error);
+        ElMessage.error("修改状态失败");
+      }
     })
     .catch(() => {
       // 取消操作
@@ -550,50 +555,6 @@ const handleUserSizeChange = (val: number) => {
 
 const handleUserCurrentChange = (val: number) => {
   userCurrentPage.value = val;
-};
-
-// 订单管理方法
-const getOrderStatusType = (status: string): string => {
-  switch (status) {
-    case "completed":
-      return "success";
-    case "pending":
-      return "warning";
-    case "cancelled":
-      return "danger";
-    default:
-      return "info";
-  }
-};
-
-const getOrderStatusText = (status: string): string => {
-  switch (status) {
-    case "completed":
-      return "已完成";
-    case "pending":
-      return "待处理";
-    case "cancelled":
-      return "已取消";
-    default:
-      return "未知";
-  }
-};
-
-const handleOrderSizeChange = (val: number) => {
-  orderPageSize.value = val;
-};
-
-const handleOrderCurrentChange = (val: number) => {
-  orderCurrentPage.value = val;
-};
-
-// 讨论管理方法
-const handlePostSizeChange = (val: number) => {
-  postPageSize.value = val;
-};
-
-const handlePostCurrentChange = (val: number) => {
-  postCurrentPage.value = val;
 };
 
 onMounted(() => {
@@ -614,7 +575,11 @@ onMounted(() => {
   align-items: center;
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-active));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-active)
+  );
   border-radius: var(--border-radius-lg);
   color: #fff;
   box-shadow: var(--shadow-medium);
@@ -626,7 +591,7 @@ onMounted(() => {
     font-weight: 700;
     margin: 0 0 var(--spacing-xs);
   }
-  
+
   .welcome-subtitle {
     font-size: var(--font-size-sm);
     opacity: 0.9;
@@ -637,7 +602,7 @@ onMounted(() => {
 .quick-actions {
   display: flex;
   gap: var(--spacing-md);
-  
+
   .el-button {
     border-radius: var(--border-radius-md);
     font-weight: 500;
@@ -647,10 +612,10 @@ onMounted(() => {
 // 统计数据区域 - 条状设计
 .stats-section {
   margin-bottom: var(--spacing-xl);
-  
+
   .stats-header {
     margin-bottom: var(--spacing-lg);
-    
+
     .section-title {
       font-size: var(--font-size-xl);
       font-weight: 600;
@@ -658,13 +623,13 @@ onMounted(() => {
       margin: 0;
     }
   }
-  
+
   .stats-bars {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
   }
-  
+
   .stat-bar {
     display: flex;
     justify-content: space-between;
@@ -674,18 +639,18 @@ onMounted(() => {
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-light);
     transition: all var(--transition-normal);
-    
+
     &:hover {
       box-shadow: var(--shadow-medium);
       transform: translateX(4px);
     }
-    
+
     .stat-bar-left {
       display: flex;
       align-items: center;
       gap: var(--spacing-md);
     }
-    
+
     .stat-bar-icon {
       width: 48px;
       height: 48px;
@@ -693,61 +658,61 @@ onMounted(() => {
       display: flex;
       align-items: center;
       justify-content: center;
-      
+
       &.primary {
         background: rgba(64, 158, 255, 0.1);
         color: var(--primary-color);
       }
-      
+
       &.success {
         background: rgba(103, 194, 58, 0.1);
         color: var(--success-color);
       }
-      
+
       &.warning {
         background: rgba(230, 162, 60, 0.1);
         color: var(--warning-color);
       }
-      
+
       &.info {
         background: rgba(144, 147, 153, 0.1);
         color: var(--info-color);
       }
     }
-    
+
     .stat-bar-info {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-xs);
     }
-    
+
     .stat-bar-label {
       font-size: var(--font-size-base);
       font-weight: 500;
       color: var(--text-primary);
     }
-    
+
     .stat-bar-trend {
       display: flex;
       align-items: center;
       gap: var(--spacing-xs);
       font-size: var(--font-size-xs);
       font-weight: 500;
-      
+
       &.up {
         color: var(--success-color);
       }
-      
+
       &.down {
         color: var(--danger-color);
       }
     }
-    
+
     .stat-bar-right {
       display: flex;
       align-items: center;
     }
-    
+
     .stat-bar-value {
       font-size: var(--font-size-xl);
       font-weight: 700;
@@ -761,24 +726,24 @@ onMounted(() => {
   margin-bottom: var(--spacing-xl);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-light);
-  
+
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     .card-title {
       font-size: var(--font-size-lg);
       font-weight: 600;
       color: var(--text-primary);
     }
-    
+
     .header-actions {
       display: flex;
       gap: var(--spacing-sm);
     }
   }
-  
+
   .el-table {
     margin: var(--spacing-md) 0;
   }
@@ -795,24 +760,24 @@ onMounted(() => {
   .main-page {
     padding: var(--spacing-lg);
   }
-  
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-lg);
   }
-  
+
   .quick-actions {
     width: 100%;
-    
+
     .el-button {
       flex: 1;
     }
   }
-  
+
   .stat-bar {
     padding: var(--spacing-md);
-    
+
     .stat-bar-value {
       font-size: var(--font-size-lg);
     }
@@ -823,45 +788,45 @@ onMounted(() => {
   .main-page {
     padding: var(--spacing-md);
   }
-  
+
   .page-header {
     padding: var(--spacing-lg);
   }
-  
+
   .welcome-title {
     font-size: var(--font-size-xl);
   }
-  
+
   .section-title {
     font-size: var(--font-size-lg);
   }
-  
+
   .stat-bar {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-md);
-    
+
     .stat-bar-right {
       align-self: flex-end;
     }
   }
-  
+
   .management-card {
     .card-header {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--spacing-md);
-      
+
       .header-actions {
         width: 100%;
-        
+
         .el-input {
           width: 100% !important;
         }
       }
     }
   }
-  
+
   .pagination-wrapper {
     justify-content: center;
   }

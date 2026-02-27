@@ -5,7 +5,7 @@ jsyl:
     port: 3306
     database: jsyl_ms
     username: root
-    password: your_password
+    password: 123456
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
@@ -15,7 +15,7 @@ jsyl:
   redis:
     host: localhost
     port: 6379
-    password: your_redis_password
+    password: 123456
     database: 10
   wechat:
     appid:

@@ -42,7 +42,7 @@ public class UserController {
         }
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.EMP_ID, user.getId());
+        claims.put(JwtClaimsConstant.USER_ID, user.getId());
 
         String token = jwtUtil.createUserJWT(claims);
 
@@ -50,6 +50,7 @@ public class UserController {
                 .id(user.getId())
                 .account(user.getAccount())
                 .token(token)
+                .role(user.getRole() != null ? user.getRole() : 1)
                 .build();
 
         log.info("用户{}登录成功，生成token：{}", user.getAccount(), token);
@@ -73,28 +74,36 @@ public class UserController {
     @GetMapping("/userInfo")
     public Result<UserVO> getUserInfo() {
         log.info("获取用户信息请求");
-        Integer userId = 1;
+        Long userIdLong = BaseContext.getCurrentId();
+        Integer userId = userIdLong != null ? userIdLong.intValue() : null;
+        if (userId == null) {
+            return Result.error("用户未登录");
+        }
         User user = userService.getUserById(userId);
         if (user == null) {
-            user = User.builder()
-                    .id(1)
-                    .account("test")
-                    .nickname("测试用户")
-                    .phone("13800138000")
-                    .permission(0)
-                    .build();
+            return Result.error("用户不存在");
         }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         userVO.setUsername(user.getNickname());
+
+        if (user.getCampusId() != null) {
+            userVO.setCampusId(user.getCampusId());
+            String campusName = userService.getCampusNameById(user.getCampusId());
+            userVO.setCampusName(campusName);
+        }
+
         return Result.success(userVO);
     }
 
     @PostMapping("/updateUserInfo")
     public Result<String> updateUserInfo(@RequestBody UserUpdateDTO userUpdateDTO) {
         log.info("更新用户信息请求：{}", userUpdateDTO);
-        Integer userId = 1;
-        User user = userService.getUserById(userId);
+        Long userId = BaseContext.getCurrentId();
+        if (userId == null) {
+            return Result.error("用户未登录");
+        }
+        User user = userService.getUserById(userId.intValue());
         if (user == null) {
             return Result.error("用户不存在");
         }
@@ -103,6 +112,9 @@ public class UserController {
         }
         if (userUpdateDTO.getPhone() != null) {
             user.setPhone(userUpdateDTO.getPhone());
+        }
+        if (userUpdateDTO.getCampusId() != null) {
+            user.setCampusId(userUpdateDTO.getCampusId());
         }
         userService.updateUserInfo(user);
         return Result.success(MessageConstant.USER_INFO_UPDATED_SUCCESS);

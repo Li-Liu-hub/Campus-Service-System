@@ -123,6 +123,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public void deleteByAdmin(Long id) {
+        Post post = postMapper.getById(id);
+        if (post == null) {
+            throw new PostNotFoundException(MessageConstant.POST_NOT_FOUND);
+        }
+        postMapper.deleteById(id);
+    }
+
+    @Override
     public PageResult pageQuery(PostPageQueryDTO postPageQueryDTO) {
         // 1. 开启分页
         PageHelper.startPage(postPageQueryDTO.getPage(), postPageQueryDTO.getPageSize());
@@ -135,6 +144,11 @@ public class PostServiceImpl implements PostService {
 
         // 4. 封装返回结果
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public List<Post> getMyPosts(Long userId) {
+        return postMapper.getMyPosts(userId.intValue(), 5);
     }
 
 }

@@ -34,4 +34,7 @@ public class OrderPageQueryDTO {
 
     /*用户姓名（昵称）*/
     private String userName;
+
+    /*校区ID*/
+    private Integer campusId;
 }

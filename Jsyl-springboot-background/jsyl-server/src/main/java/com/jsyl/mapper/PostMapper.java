@@ -3,6 +3,8 @@ package com.jsyl.mapper;
 import com.jsyl.dto.PostPageQueryDTO;
 import com.jsyl.entity.Post;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -28,5 +30,8 @@ public interface PostMapper {
     void decrementReplyCount(Long id);
 
     List<Post> pageQuery(PostPageQueryDTO postPageQueryDTO);
+
+    @Select("SELECT * FROM post_info WHERE user_id = #{userId} ORDER BY create_time DESC LIMIT #{limit}")
+    List<Post> getMyPosts(@Param("userId") Integer userId, @Param("limit") Integer limit);
 
 }

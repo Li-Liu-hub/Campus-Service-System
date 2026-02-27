@@ -73,8 +73,38 @@ public class Order implements Serializable {
     private LocalDateTime createTime;
 
     /**
+     * 订单要求时间
+     */
+    private LocalDateTime requireTime;
+
+    /**
+     * 订单完成时间
+     */
+    private LocalDateTime completeTime;
+
+    /**
+     * 校区ID
+     */
+    private Integer campusId;
+
+    /**
      * 发布者昵称
      */
     private String publisherNickname;
+
+    /**
+     * 接单者昵称
+     */
+    private String acceptorNickname;
+
+    /**
+     * 发布者是否申请取消: 0-否 1-是
+     */
+    private Integer publisherCancel;
+
+    /**
+     * 接单者是否申请取消: 0-否 1-是
+     */
+    private Integer acceptorCancel;
 
 }

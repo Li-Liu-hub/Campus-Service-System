@@ -31,7 +31,11 @@
           </el-menu>
         </div>
         <div class="header-right">
-          <el-badge :value="notificationCount" :hidden="notificationCount === 0" class="notification-badge">
+          <el-badge
+            :value="notificationCount"
+            :hidden="notificationCount === 0"
+            class="notification-badge"
+          >
             <el-tooltip content="消息通知" placement="bottom">
               <el-button circle @click="showNotifications = true">
                 <el-icon><Bell /></el-icon>
@@ -51,10 +55,6 @@
                 <el-dropdown-item command="profile">
                   <el-icon><UserFilled /></el-icon>
                   个人中心
-                </el-dropdown-item>
-                <el-dropdown-item command="settings">
-                  <el-icon><Setting /></el-icon>
-                  账户设置
                 </el-dropdown-item>
                 <el-dropdown-item divided command="logout">
                   <el-icon><SwitchButton /></el-icon>
@@ -105,9 +105,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Odometer,
   House,
@@ -120,8 +120,8 @@ import {
   Setting,
   SwitchButton,
   InfoFilled,
-  SuccessFilled
-} from '@element-plus/icons-vue';
+  SuccessFilled,
+} from "@element-plus/icons-vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -132,36 +132,52 @@ const notificationCount = ref(2);
 const activeMenu = computed(() => route.path);
 
 const notifications = ref([
-  { id: 1, title: '订单更新', desc: '您的订单 ORD20260216001 已接单', time: '10分钟前', type: 'success', icon: SuccessFilled, unread: true },
-  { id: 2, title: '新回复', desc: '您的帖子收到了新的回复', time: '1小时前', type: 'info', icon: InfoFilled, unread: false }
+  {
+    id: 1,
+    title: "订单更新",
+    desc: "您的订单 ORD20260216001 已接单",
+    time: "10分钟前",
+    type: "success",
+    icon: SuccessFilled,
+    unread: true,
+  },
+  {
+    id: 2,
+    title: "新回复",
+    desc: "您的帖子收到了新的回复",
+    time: "1小时前",
+    type: "info",
+    icon: InfoFilled,
+    unread: false,
+  },
 ]);
 
 const handleMenuSelect = (index: string) => {
-  console.log('菜单点击，索引:', index);
-  console.log('当前路由:', route.path);
-  
+  console.log("菜单点击，索引:", index);
+  console.log("当前路由:", route.path);
+
   if (route.path === index) {
-    console.log('已经在目标页面，无需跳转');
+    console.log("已经在目标页面，无需跳转");
     return;
   }
-  
-  router.push(index).then(() => {
-    console.log('导航成功到:', index);
-  }).catch((err) => {
-    console.error('导航失败:', err);
-    ElMessage.error('页面跳转失败');
-  });
+
+  router
+    .push(index)
+    .then(() => {
+      console.log("导航成功到:", index);
+    })
+    .catch((err) => {
+      console.error("导航失败:", err);
+      ElMessage.error("页面跳转失败");
+    });
 };
 
 const handleUserCommand = (command: string) => {
   switch (command) {
-    case 'profile':
-      router.push('/user/profile');
+    case "profile":
+      router.push("/user/profile");
       break;
-    case 'settings':
-      router.push('/user/settings');
-      break;
-    case 'logout':
+    case "logout":
       handleLogout();
       break;
   }
@@ -169,21 +185,23 @@ const handleUserCommand = (command: string) => {
 
 const handleLogout = async () => {
   try {
-    await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
+    await ElMessageBox.confirm("确定要退出登录吗？", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
     });
     localStorage.clear();
-    ElMessage.success('退出登录成功');
-    router.push('/login');
-  } catch {
-  }
+    ElMessage.success("退出登录成功");
+    router.push("/login");
+  } catch {}
 };
 
-watch(() => route.path, () => {
-  window.scrollTo(0, 0);
-});
+watch(
+  () => route.path,
+  () => {
+    window.scrollTo(0, 0);
+  }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -272,7 +290,11 @@ watch(() => route.path, () => {
   }
 
   .user-avatar {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-active));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-active)
+    );
   }
 
   .user-name {
@@ -312,7 +334,7 @@ watch(() => route.path, () => {
       background: rgba(64, 158, 255, 0.05);
 
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         left: 0;
         top: 0;

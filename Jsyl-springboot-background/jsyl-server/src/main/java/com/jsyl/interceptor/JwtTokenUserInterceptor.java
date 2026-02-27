@@ -1,8 +1,10 @@
 package com.jsyl.interceptor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsyl.constant.JwtClaimsConstant;
 import com.jsyl.context.BaseContext;
 import com.jsyl.properties.JwtProperties;
+import com.jsyl.result.Result;
 import com.jsyl.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * jwt令牌校验的拦截器（用户端）
@@ -27,15 +30,8 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtUtil jwtUtil;
 
-    /**
-     * 校验jwt
-     *
-     * @param request
-     * @param response
-     * @param handler
-     * @return
-     * @throws Exception
-     */
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
@@ -56,7 +52,7 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
 
             if (token == null || token.trim().isEmpty()) {
                 log.error("JWT令牌为空");
-                response.setStatus(401);
+                sendUnauthorizedResponse(response, "请先登录");
                 return false;
             }
 
@@ -70,8 +66,15 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
             return true;
         } catch (Exception ex) {
             log.error("JWT校验失败：{}", ex.getMessage());
-            response.setStatus(401);
+            sendUnauthorizedResponse(response, "登录已过期，请重新登录");
             return false;
         }
+    }
+
+    private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(200);
+        response.setContentType("application/json;charset=utf-8");
+        Result<String> result = Result.error(message);
+        response.getWriter().write(objectMapper.writeValueAsString(result));
     }
 }

@@ -11,6 +11,8 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
+import { getToken } from '@/utils/storage';
+import { ElMessage } from 'element-plus';
 
 // ==================== 类型定义 ====================
 
@@ -120,11 +122,29 @@ const routes: AppRouteRecordRaw[] = [
         }
       },
       {
+        path: 'chat/:targetUserId',
+        name: 'UserChat',
+        component: () => import('@/views/user/UserChat.vue'),
+        meta: {
+          title: '聊天',
+          requiresAuth: true
+        }
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/Profile.vue'),
         meta: {
           title: '个人中心',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'settings',
+        name: 'UserSettings',
+        component: () => import('@/views/Profile.vue'),
+        meta: {
+          title: '账户设置',
           requiresAuth: true
         }
       }
@@ -166,6 +186,24 @@ const routes: AppRouteRecordRaw[] = [
           title: '帖子管理',
           requiresAuth: true
         }
+      },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import('@/components/admin/UserManagement.vue'),
+        meta: {
+          title: '用户管理',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'profile',
+        name: 'AdminProfile',
+        component: () => import('@/views/Profile.vue'),
+        meta: {
+          title: '个人中心',
+          requiresAuth: true
+        }
       }
     ]
   }
@@ -195,6 +233,35 @@ const router = createRouter({
  */
 router.beforeEach((to, _from, next) => {
   setPageTitle(to);
+  
+  const token = getToken();
+  const userInfoStr = localStorage.getItem('userInfo');
+  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
+  const userRole = userInfo?.role || 0;
+  
+  const isAdminRoute = to.path.startsWith('/admin');
+  const isUserRoute = to.path.startsWith('/user');
+  
+  if (to.meta.requiresAuth) {
+    if (!token) {
+      ElMessage.warning('请先登录');
+      next('/login');
+      return;
+    }
+    
+    if (isAdminRoute && userRole !== 4) {
+      ElMessage.warning('您没有权限访问该页面');
+      next('/user/home');
+      return;
+    }
+    
+    if (isUserRoute && userRole === 4) {
+      ElMessage.warning('管理员请访问管理后台');
+      next('/admin/dashboard');
+      return;
+    }
+  }
+  
   next();
 });
 

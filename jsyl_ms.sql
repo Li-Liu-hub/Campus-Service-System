@@ -11,7 +11,7 @@
  Target Server Version : 80040 (8.0.40)
  File Encoding         : 65001
 
- Date: 17/02/2026 23:38:56
+ Date: 22/02/2026 18:22:05
 */
 
 SET NAMES utf8mb4;
@@ -25,12 +25,13 @@ CREATE TABLE `campus_info`  (
   `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '校区ID',
   `campus_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '校区名称',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '校区信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '校区信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of campus_info
 -- ----------------------------
-INSERT INTO `campus_info` VALUES (1, '默认主校区');
+INSERT INTO `campus_info` VALUES (1, '东校区');
+INSERT INTO `campus_info` VALUES (2, '西校区');
 
 -- ----------------------------
 -- Table structure for comment_info
@@ -49,7 +50,7 @@ CREATE TABLE `comment_info`  (
   INDEX `idx_parent_id`(`parent_id` ASC) USING BTREE,
   CONSTRAINT `fk_comment_post` FOREIGN KEY (`post_id`) REFERENCES `post_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `fk_comment_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 131 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评论信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 133 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评论信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of comment_info
@@ -184,6 +185,8 @@ INSERT INTO `comment_info` VALUES (127, 49, 0, 4, '学校附近就有蛋糕店�
 INSERT INTO `comment_info` VALUES (128, 49, 0, 5, '可以美团上看看评价。', '2026-02-13 14:36:42');
 INSERT INTO `comment_info` VALUES (129, 50, 0, 5, '同求推荐！', '2026-02-13 23:03:42');
 INSERT INTO `comment_info` VALUES (130, 50, 0, 6, '学校附近有几家蛋糕店，都还可以。', '2026-02-13 08:52:42');
+INSERT INTO `comment_info` VALUES (131, 50, 0, 2, '你好', '2026-02-18 10:22:14');
+INSERT INTO `comment_info` VALUES (132, 50, 0, 2, '你好', '2026-02-19 12:52:24');
 
 -- ----------------------------
 -- Table structure for conversation
@@ -203,11 +206,13 @@ CREATE TABLE `conversation`  (
   INDEX `fk_conv_target`(`target_user_id` ASC) USING BTREE,
   CONSTRAINT `fk_conv_target` FOREIGN KEY (`target_user_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `fk_conv_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户会话表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of conversation
 -- ----------------------------
+INSERT INTO `conversation` VALUES (1, 51, 2, '你好', 0, '2026-02-19 13:14:17', '2026-02-21 16:41:54');
+INSERT INTO `conversation` VALUES (2, 2, 51, '你好', 13, '2026-02-19 13:14:17', '2026-02-21 16:41:54');
 
 -- ----------------------------
 -- Table structure for notification
@@ -246,7 +251,7 @@ CREATE TABLE `order_evaluation`  (
   UNIQUE INDEX `uk_eval_order`(`order_id` ASC) USING BTREE,
   INDEX `idx_eval_target`(`target_user_id` ASC) USING BTREE,
   CONSTRAINT `fk_eval_order` FOREIGN KEY (`order_id`) REFERENCES `order_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单评价表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单评价表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of order_evaluation
@@ -272,6 +277,8 @@ CREATE TABLE `order_info`  (
   `complete_time` datetime NULL DEFAULT NULL COMMENT '订单完成时间',
   `deleted_at` datetime NULL DEFAULT NULL COMMENT '删除时间（NULL表示未删除）',
   `campus_id` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '校区ID',
+  `publisher_cancel` tinyint NOT NULL DEFAULT 0 COMMENT '发布者是否申请取消: 0-否 1-是',
+  `acceptor_cancel` tinyint NOT NULL DEFAULT 0 COMMENT '接单者是否申请取消: 0-否 1-是',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_order_no`(`order_no` ASC) USING BTREE,
   INDEX `fk_order_user`(`user_id` ASC) USING BTREE,
@@ -282,161 +289,165 @@ CREATE TABLE `order_info`  (
   CONSTRAINT `fk_order_type` FOREIGN KEY (`type_id`) REFERENCES `order_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_order_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `ck_order_amount` CHECK (`order_amount` >= 0)
-) ENGINE = InnoDB AUTO_INCREMENT = 151 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 155 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of order_info
 -- ----------------------------
-INSERT INTO `order_info` VALUES (1, 'ORD20260215001', 2, NULL, '北区食堂门口', '帮我带一份黄焖鸡米饭，微辣', '13800138001', 18.50, 0, 5, '2026-02-14 20:55:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (2, 'ORD20260215002', 3, NULL, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 0, 6, '2026-02-15 09:17:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (3, 'ORD20260215003', 4, NULL, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 0, 3, '2026-02-14 17:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (4, 'ORD20260215004', 5, NULL, '东区超市', '买两瓶矿泉水和一包纸巾，送到东区5栋', '13800138004', 12.00, 0, 4, '2026-02-14 18:46:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (5, 'ORD20260215005', 6, NULL, '西区校门', '帮我把这份文件送到行政楼教务处', '13800138005', 8.00, 0, 1, '2026-02-15 04:05:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (6, 'ORD20260215006', 7, NULL, '北区1栋楼下', '取一个圆通快递，送到北区7栋', '13800138006', 3.00, 0, 2, '2026-02-14 21:31:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (7, 'ORD20260215007', 8, NULL, '南区二食堂', '帮我带一份糖醋排骨饭，不要香菜', '13800138007', 16.80, 0, 5, '2026-02-15 08:45:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (8, 'ORD20260215008', 9, NULL, '菜鸟驿站', '取两个快递，都是中通的，送到北区9栋', '13800138008', 6.00, 0, 6, '2026-02-15 12:35:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (9, 'ORD20260215009', 10, NULL, '教学楼A座', '打印100份PPT，彩色单面', '13800138009', 50.00, 0, 3, '2026-02-14 22:05:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (10, 'ORD20260215010', 11, NULL, '校园超市', '买一箱牛奶和一些零食，送到南区11栋', '13800138010', 65.00, 0, 4, '2026-02-15 10:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (11, 'ORD20260215011', 12, NULL, '北区三食堂', '帮我带一份兰州拉面，加蛋', '13800138011', 14.00, 0, 5, '2026-02-14 17:17:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (12, 'ORD20260215012', 13, NULL, '顺丰快递点', '取一个大件快递，送到东区13栋', '13800138012', 10.00, 0, 6, '2026-02-14 17:45:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (13, 'ORD20260215013', 14, NULL, '图书馆打印室', '打印20份论文，装订成册', '13800138013', 30.00, 0, 3, '2026-02-14 22:18:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (14, 'ORD20260215014', 15, NULL, '西区水果店', '买一些苹果和香蕉，送到西区15栋', '13800138014', 25.00, 0, 4, '2026-02-14 19:37:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (15, 'ORD20260215015', 16, NULL, '南区一食堂', '帮我带一份麻辣香锅，微辣', '13800138015', 22.00, 0, 5, '2026-02-14 16:35:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (16, 'ORD20260215016', 17, NULL, '韵达快递站', '取一个快递，送到北区17栋', '13800138016', 4.00, 0, 2, '2026-02-15 09:27:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (17, 'ORD20260215017', 18, NULL, '教学楼B座', '打印30份作业，双面打印', '13800138017', 9.00, 0, 3, '2026-02-15 06:53:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (18, 'ORD20260215018', 19, NULL, '校园便利店', '买一些日用品，送到南区19栋', '13800138018', 45.00, 0, 4, '2026-02-14 15:27:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (19, 'ORD20260215019', 20, NULL, '北区二食堂', '帮我带一份盖浇饭，土豆牛肉', '13800138019', 15.00, 0, 5, '2026-02-14 18:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (20, 'ORD20260215020', 21, NULL, '申通快递点', '取两个快递，送到东区21栋', '13800138020', 7.00, 0, 6, '2026-02-15 05:09:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (21, 'ORD20260215021', 22, NULL, '图书馆', '帮我占一个座位，靠窗的位置', '13800138021', 5.00, 0, 1, '2026-02-15 05:06:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (22, 'ORD20260215022', 23, NULL, '南区三食堂', '帮我带一份麻辣烫，不要麻不要辣', '13800138022', 18.00, 0, 5, '2026-02-14 19:24:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (23, 'ORD20260215023', 24, NULL, '京东快递站', '取一个快递，送到西区23栋', '13800138023', 4.00, 0, 2, '2026-02-14 19:04:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (24, 'ORD20260215024', 25, NULL, '打印店', '打印一张海报，A3彩色', '13800138024', 20.00, 0, 3, '2026-02-14 22:34:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (25, 'ORD20260215025', 26, NULL, '校园超市', '买一些饮料和零食，送到北区25栋', '13800138025', 35.00, 0, 4, '2026-02-14 17:01:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (26, 'ORD20260215026', 27, NULL, '北区一食堂', '帮我带一份包子和豆浆', '13800138026', 8.00, 0, 5, '2026-02-15 02:48:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (27, 'ORD20260215027', 28, NULL, '圆通快递站', '取一个快递，送到南区27栋', '13800138027', 3.00, 0, 6, '2026-02-14 20:21:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (28, 'ORD20260215028', 29, NULL, '教学楼C座', '打印50份试卷，单面黑白', '13800138028', 25.00, 0, 3, '2026-02-15 06:43:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (29, 'ORD20260215029', 30, NULL, '水果店', '买一个西瓜，送到东区29栋', '13800138029', 30.00, 0, 4, '2026-02-15 05:57:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (30, 'ORD20260215030', 31, NULL, '南区二食堂', '帮我带一份炒饭，加火腿肠', '13800138030', 12.00, 0, 5, '2026-02-14 18:58:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (31, 'ORD20260215031', 32, NULL, '中通快递站', '取一个快递，送到西区31栋', '13800138031', 4.00, 0, 2, '2026-02-15 14:24:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (32, 'ORD20260215032', 33, NULL, '图书馆打印室', '打印10份简历，彩色', '13800138032', 15.00, 0, 3, '2026-02-15 00:27:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (33, 'ORD20260215033', 34, NULL, '校园超市', '买一些学习用品，送到北区33栋', '13800138033', 28.00, 0, 4, '2026-02-14 16:27:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (34, 'ORD20260215034', 35, NULL, '北区三食堂', '帮我带一份水饺，猪肉馅的', '13800138034', 16.00, 0, 5, '2026-02-14 18:19:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (35, 'ORD20260215035', 36, NULL, '韵达快递站', '取两个快递，送到南区35栋', '13800138035', 6.00, 0, 6, '2026-02-15 03:36:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (36, 'ORD20260215036', 37, NULL, '教学楼A座', '打印20份课件，双面打印', '13800138036', 8.00, 0, 3, '2026-02-14 20:28:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (37, 'ORD20260215037', 38, NULL, '便利店', '买一些零食和饮料，送到东区37栋', '13800138037', 40.00, 0, 4, '2026-02-15 04:54:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (38, 'ORD20260215038', 39, NULL, '南区一食堂', '帮我带一份套餐，一荤一素', '13800138038', 14.00, 0, 5, '2026-02-14 20:31:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (39, 'ORD20260215039', 40, NULL, '顺丰快递点', '取一个快递，送到西区39栋', '13800138039', 5.00, 0, 2, '2026-02-15 01:16:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (40, 'ORD20260215040', 41, NULL, '打印店', '打印一张证件照，一寸', '13800138040', 15.00, 0, 3, '2026-02-15 02:08:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (41, 'ORD20260215041', 42, NULL, '校园超市', '买一些水果和牛奶，送到北区41栋', '13800138041', 55.00, 0, 4, '2026-02-14 16:18:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (42, 'ORD20260215042', 43, NULL, '北区二食堂', '帮我带一份面条，加煎蛋', '13800138042', 13.00, 0, 5, '2026-02-15 12:31:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (43, 'ORD20260215043', 44, NULL, '申通快递站', '取一个快递，送到南区43栋', '13800138043', 4.00, 0, 6, '2026-02-14 23:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (44, 'ORD20260215044', 45, NULL, '教学楼B座', '打印40份资料，单面打印', '13800138044', 12.00, 0, 3, '2026-02-14 15:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (45, 'ORD20260215045', 46, NULL, '水果店', '买一些草莓，送到东区45栋', '13800138045', 35.00, 0, 4, '2026-02-14 15:29:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (46, 'ORD20260215046', 47, NULL, '南区三食堂', '帮我带一份快餐，两荤一素', '13800138046', 18.00, 0, 5, '2026-02-14 17:40:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (47, 'ORD20260215047', 48, NULL, '京东快递站', '取一个快递，送到西区47栋', '13800138047', 5.00, 0, 2, '2026-02-15 03:17:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (48, 'ORD20260215048', 49, NULL, '图书馆打印室', '打印15份论文，装订', '13800138048', 22.00, 0, 3, '2026-02-14 20:49:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (49, 'ORD20260215049', 50, NULL, '校园超市', '买一些日用品和零食，送到北区49栋', '13800138049', 50.00, 0, 4, '2026-02-15 07:35:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (50, 'ORD20260215050', 2, NULL, '北区一食堂', '帮我带一份早餐，包子和粥', '13800138001', 10.00, 0, 5, '2026-02-15 08:54:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (51, 'ORD20260215051', 3, 10, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 1, 6, '2026-02-15 07:09:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (52, 'ORD20260215052', 4, 11, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 1, 3, '2026-02-14 18:27:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (53, 'ORD20260215053', 5, 12, '东区超市', '买两瓶矿泉水和一包纸巾，送到东区5栋', '13800138004', 12.00, 1, 4, '2026-02-15 08:12:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (54, 'ORD20260215054', 6, 13, '西区校门', '帮我把这份文件送到行政楼教务处', '13800138005', 8.00, 1, 1, '2026-02-14 19:03:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (55, 'ORD20260215055', 7, 14, '北区1栋楼下', '取一个圆通快递，送到北区7栋', '13800138006', 3.00, 1, 2, '2026-02-15 07:59:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (56, 'ORD20260215056', 8, 15, '南区二食堂', '帮我带一份糖醋排骨饭，不要香菜', '13800138007', 16.80, 1, 5, '2026-02-14 16:13:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (57, 'ORD20260215057', 9, 16, '菜鸟驿站', '取两个快递，都是中通的，送到北区9栋', '13800138008', 6.00, 1, 6, '2026-02-14 18:29:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (58, 'ORD20260215058', 10, 17, '教学楼A座', '打印100份PPT，彩色单面', '13800138009', 50.00, 1, 3, '2026-02-15 05:11:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (59, 'ORD20260215059', 11, 18, '校园超市', '买一箱牛奶和一些零食，送到南区11栋', '13800138010', 65.00, 1, 4, '2026-02-15 03:50:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (60, 'ORD20260215060', 12, 19, '北区三食堂', '帮我带一份兰州拉面，加蛋', '13800138011', 14.00, 1, 5, '2026-02-15 13:03:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (61, 'ORD20260215061', 13, 20, '顺丰快递点', '取一个大件快递，送到东区13栋', '13800138012', 10.00, 1, 6, '2026-02-14 15:07:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (62, 'ORD20260215062', 14, 21, '图书馆打印室', '打印20份论文，装订成册', '13800138013', 30.00, 1, 3, '2026-02-14 21:50:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (63, 'ORD20260215063', 15, 22, '西区水果店', '买一些苹果和香蕉，送到西区15栋', '13800138014', 25.00, 1, 4, '2026-02-15 01:12:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (64, 'ORD20260215064', 16, 23, '南区一食堂', '帮我带一份麻辣香锅，微辣', '13800138015', 22.00, 1, 5, '2026-02-14 21:56:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (65, 'ORD20260215065', 17, 24, '韵达快递站', '取一个快递，送到北区17栋', '13800138016', 4.00, 1, 2, '2026-02-14 19:25:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (66, 'ORD20260215066', 18, 25, '教学楼B座', '打印30份作业，双面打印', '13800138017', 9.00, 1, 3, '2026-02-14 16:39:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (67, 'ORD20260215067', 19, 26, '校园便利店', '买一些日用品，送到南区19栋', '13800138018', 45.00, 1, 4, '2026-02-15 10:26:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (68, 'ORD20260215068', 20, 27, '北区二食堂', '帮我带一份盖浇饭，土豆牛肉', '13800138019', 15.00, 1, 5, '2026-02-15 11:36:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (69, 'ORD20260215069', 21, 28, '申通快递点', '取两个快递，送到东区21栋', '13800138020', 7.00, 1, 6, '2026-02-15 12:05:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (70, 'ORD20260215070', 22, 29, '图书馆', '帮我占一个座位，靠窗的位置', '13800138021', 5.00, 1, 1, '2026-02-15 11:01:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (71, 'ORD20260215071', 23, 30, '南区三食堂', '帮我带一份麻辣烫，不要麻不要辣', '13800138022', 18.00, 1, 5, '2026-02-15 04:14:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (72, 'ORD20260215072', 24, 31, '京东快递站', '取一个快递，送到西区23栋', '13800138023', 4.00, 1, 2, '2026-02-14 21:30:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (73, 'ORD20260215073', 25, 32, '打印店', '打印一张海报，A3彩色', '13800138024', 20.00, 1, 3, '2026-02-15 08:14:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (74, 'ORD20260215074', 26, 33, '校园超市', '买一些饮料和零食，送到北区25栋', '13800138025', 35.00, 1, 4, '2026-02-15 10:00:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (75, 'ORD20260215075', 27, 34, '北区一食堂', '帮我带一份包子和豆浆', '13800138026', 8.00, 1, 5, '2026-02-15 10:44:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (76, 'ORD20260215076', 28, 35, '圆通快递站', '取一个快递，送到南区27栋', '13800138027', 3.00, 1, 6, '2026-02-15 09:04:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (77, 'ORD20260215077', 29, 36, '教学楼C座', '打印50份试卷，单面黑白', '13800138028', 25.00, 1, 3, '2026-02-14 22:28:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (78, 'ORD20260215078', 30, 37, '水果店', '买一个西瓜，送到东区29栋', '13800138029', 30.00, 1, 4, '2026-02-14 22:35:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (79, 'ORD20260215079', 31, 38, '南区二食堂', '帮我带一份炒饭，加火腿肠', '13800138030', 12.00, 1, 5, '2026-02-15 06:55:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (80, 'ORD20260215080', 32, 39, '中通快递站', '取一个快递，送到西区31栋', '13800138031', 4.00, 1, 2, '2026-02-15 00:11:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (81, 'ORD20260215081', 33, 40, '图书馆打印室', '打印10份简历，彩色', '13800138032', 15.00, 1, 3, '2026-02-15 13:34:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (82, 'ORD20260215082', 34, 41, '校园超市', '买一些学习用品，送到北区33栋', '13800138033', 28.00, 1, 4, '2026-02-15 04:42:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (83, 'ORD20260215083', 35, 42, '北区三食堂', '帮我带一份水饺，猪肉馅的', '13800138034', 16.00, 1, 5, '2026-02-14 16:12:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (84, 'ORD20260215084', 36, 43, '韵达快递站', '取两个快递，送到南区35栋', '13800138035', 6.00, 1, 6, '2026-02-15 04:17:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (85, 'ORD20260215085', 37, 44, '教学楼A座', '打印20份课件，双面打印', '13800138036', 8.00, 1, 3, '2026-02-15 06:13:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (86, 'ORD20260215086', 38, 45, '便利店', '买一些零食和饮料，送到东区37栋', '13800138037', 40.00, 1, 4, '2026-02-15 03:38:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (87, 'ORD20260215087', 39, 46, '南区一食堂', '帮我带一份套餐，一荤一素', '13800138038', 14.00, 1, 5, '2026-02-15 08:56:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (88, 'ORD20260215088', 40, 47, '顺丰快递点', '取一个快递，送到西区39栋', '13800138039', 5.00, 1, 2, '2026-02-14 19:06:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (89, 'ORD20260215089', 41, 48, '打印店', '打印一张证件照，一寸', '13800138040', 15.00, 1, 3, '2026-02-15 06:07:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (90, 'ORD20260215090', 42, 49, '校园超市', '买一些水果和牛奶，送到北区41栋', '13800138041', 55.00, 1, 4, '2026-02-15 06:41:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (91, 'ORD20260215091', 43, 2, '北区二食堂', '帮我带一份面条，加煎蛋', '13800138042', 13.00, 1, 5, '2026-02-15 00:29:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (92, 'ORD20260215092', 44, 3, '申通快递站', '取一个快递，送到南区43栋', '13800138043', 4.00, 1, 6, '2026-02-14 15:42:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (93, 'ORD20260215093', 45, 4, '教学楼B座', '打印40份资料，单面打印', '13800138044', 12.00, 1, 3, '2026-02-15 14:29:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (94, 'ORD20260215094', 46, 5, '水果店', '买一些草莓，送到东区45栋', '13800138045', 35.00, 1, 4, '2026-02-15 10:42:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (95, 'ORD20260215095', 47, 6, '南区三食堂', '帮我带一份快餐，两荤一素', '13800138046', 18.00, 1, 5, '2026-02-14 19:26:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (96, 'ORD20260215096', 48, 7, '京东快递站', '取一个快递，送到西区47栋', '13800138047', 5.00, 1, 2, '2026-02-15 02:28:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (97, 'ORD20260215097', 49, 8, '图书馆打印室', '打印15份论文，装订', '13800138048', 22.00, 1, 3, '2026-02-15 11:24:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (98, 'ORD20260215098', 50, 9, '校园超市', '买一些日用品和零食，送到北区49栋', '13800138049', 50.00, 1, 4, '2026-02-15 11:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (99, 'ORD20260215099', 2, 10, '北区一食堂', '帮我带一份早餐，包子和粥', '13800138001', 10.00, 1, 5, '2026-02-15 06:22:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (100, 'ORD20260215100', 3, 11, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 1, 6, '2026-02-15 08:05:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (101, 'ORD20260215101', 4, 12, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 2, 3, '2026-02-15 06:45:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (102, 'ORD20260215102', 5, 13, '东区超市', '买两瓶矿泉水和一包纸巾，送到东区5栋', '13800138004', 12.00, 2, 4, '2026-02-14 18:54:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (103, 'ORD20260215103', 6, 14, '西区校门', '帮我把这份文件送到行政楼教务处', '13800138005', 8.00, 2, 1, '2026-02-15 11:35:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (104, 'ORD20260215104', 7, 15, '北区1栋楼下', '取一个圆通快递，送到北区7栋', '13800138006', 3.00, 2, 2, '2026-02-15 10:40:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (105, 'ORD20260215105', 8, 16, '南区二食堂', '帮我带一份糖醋排骨饭，不要香菜', '13800138007', 16.80, 2, 5, '2026-02-15 03:56:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (106, 'ORD20260215106', 9, 17, '菜鸟驿站', '取两个快递，都是中通的，送到北区9栋', '13800138008', 6.00, 2, 6, '2026-02-14 21:03:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (107, 'ORD20260215107', 10, 18, '教学楼A座', '打印100份PPT，彩色单面', '13800138009', 50.00, 2, 3, '2026-02-15 06:51:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (108, 'ORD20260215108', 11, 19, '校园超市', '买一箱牛奶和一些零食，送到南区11栋', '13800138010', 65.00, 2, 4, '2026-02-15 04:29:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (109, 'ORD20260215109', 12, 20, '北区三食堂', '帮我带一份兰州拉面，加蛋', '13800138011', 14.00, 2, 5, '2026-02-15 11:15:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (110, 'ORD20260215110', 13, 21, '顺丰快递点', '取一个大件快递，送到东区13栋', '13800138012', 10.00, 2, 6, '2026-02-15 04:11:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (111, 'ORD20260215111', 14, 22, '图书馆打印室', '打印20份论文，装订成册', '13800138013', 30.00, 2, 3, '2026-02-14 20:36:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (112, 'ORD20260215112', 15, 23, '西区水果店', '买一些苹果和香蕉，送到西区15栋', '13800138014', 25.00, 2, 4, '2026-02-15 03:51:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (113, 'ORD20260215113', 16, 24, '南区一食堂', '帮我带一份麻辣香锅，微辣', '13800138015', 22.00, 2, 5, '2026-02-14 14:51:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (114, 'ORD20260215114', 17, 25, '韵达快递站', '取一个快递，送到北区17栋', '13800138016', 4.00, 2, 2, '2026-02-15 00:06:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (115, 'ORD20260215115', 18, 26, '教学楼B座', '打印30份作业，双面打印', '13800138017', 9.00, 2, 3, '2026-02-15 13:20:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (116, 'ORD20260215116', 19, 27, '校园便利店', '买一些日用品，送到南区19栋', '13800138018', 45.00, 2, 4, '2026-02-15 03:45:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (117, 'ORD20260215117', 20, 28, '北区二食堂', '帮我带一份盖浇饭，土豆牛肉', '13800138019', 15.00, 2, 5, '2026-02-15 12:08:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (118, 'ORD20260215118', 21, 29, '申通快递点', '取两个快递，送到东区21栋', '13800138020', 7.00, 2, 6, '2026-02-15 10:49:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (119, 'ORD20260215119', 22, 30, '图书馆', '帮我占一个座位，靠窗的位置', '13800138021', 5.00, 2, 1, '2026-02-15 03:04:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (120, 'ORD20260215120', 23, 31, '南区三食堂', '帮我带一份麻辣烫，不要麻不要辣', '13800138022', 18.00, 2, 5, '2026-02-14 16:15:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (121, 'ORD20260215121', 24, 32, '京东快递站', '取一个快递，送到西区23栋', '13800138023', 4.00, 2, 2, '2026-02-15 09:28:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (122, 'ORD20260215122', 25, 33, '打印店', '打印一张海报，A3彩色', '13800138024', 20.00, 2, 3, '2026-02-15 07:58:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (123, 'ORD20260215123', 26, 34, '校园超市', '买一些饮料和零食，送到北区25栋', '13800138025', 35.00, 2, 4, '2026-02-14 20:48:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (124, 'ORD20260215124', 27, 35, '北区一食堂', '帮我带一份包子和豆浆', '13800138026', 8.00, 2, 5, '2026-02-14 17:31:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (125, 'ORD20260215125', 28, 36, '圆通快递站', '取一个快递，送到南区27栋', '13800138027', 3.00, 2, 6, '2026-02-15 10:34:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (126, 'ORD20260215126', 29, 37, '教学楼C座', '打印50份试卷，单面黑白', '13800138028', 25.00, 2, 3, '2026-02-15 09:39:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (127, 'ORD20260215127', 30, 38, '水果店', '买一个西瓜，送到东区29栋', '13800138029', 30.00, 2, 4, '2026-02-15 01:57:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (128, 'ORD20260215128', 31, 39, '南区二食堂', '帮我带一份炒饭，加火腿肠', '13800138030', 12.00, 2, 5, '2026-02-15 14:11:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (129, 'ORD20260215129', 32, 40, '中通快递站', '取一个快递，送到西区31栋', '13800138031', 4.00, 2, 2, '2026-02-15 02:27:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (130, 'ORD20260215130', 33, 41, '图书馆打印室', '打印10份简历，彩色', '13800138032', 15.00, 2, 3, '2026-02-15 03:06:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (131, 'ORD20260215131', 34, 42, '校园超市', '买一些学习用品，送到北区33栋', '13800138033', 28.00, 2, 4, '2026-02-14 17:32:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (132, 'ORD20260215132', 35, 43, '北区三食堂', '帮我带一份水饺，猪肉馅的', '13800138034', 16.00, 2, 5, '2026-02-14 15:47:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (133, 'ORD20260215133', 36, 44, '韵达快递站', '取两个快递，送到南区35栋', '13800138035', 6.00, 2, 6, '2026-02-15 11:40:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (134, 'ORD20260215134', 37, 45, '教学楼A座', '打印20份课件，双面打印', '13800138036', 8.00, 2, 3, '2026-02-14 20:24:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (135, 'ORD20260215135', 38, 46, '便利店', '买一些零食和饮料，送到东区37栋', '13800138037', 40.00, 2, 4, '2026-02-15 04:23:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (136, 'ORD20260215136', 39, 47, '南区一食堂', '帮我带一份套餐，一荤一素', '13800138038', 14.00, 2, 5, '2026-02-14 18:05:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (137, 'ORD20260215137', 40, 48, '顺丰快递点', '取一个快递，送到西区39栋', '13800138039', 5.00, 2, 2, '2026-02-14 14:43:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (138, 'ORD20260215138', 41, 49, '打印店', '打印一张证件照，一寸', '13800138040', 15.00, 2, 3, '2026-02-15 04:40:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (139, 'ORD20260215139', 42, 2, '校园超市', '买一些水果和牛奶，送到北区41栋', '13800138041', 55.00, 2, 4, '2026-02-15 12:35:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (140, 'ORD20260215140', 43, 3, '北区二食堂', '帮我带一份面条，加煎蛋', '13800138042', 13.00, 2, 5, '2026-02-15 10:21:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (141, 'ORD20260215141', 44, 4, '申通快递站', '取一个快递，送到南区43栋', '13800138043', 4.00, 2, 6, '2026-02-14 23:22:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (142, 'ORD20260215142', 45, 5, '教学楼B座', '打印40份资料，单面打印', '13800138044', 12.00, 2, 3, '2026-02-14 23:12:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (143, 'ORD20260215143', 46, 6, '水果店', '买一些草莓，送到东区45栋', '13800138045', 35.00, 2, 4, '2026-02-15 07:15:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (144, 'ORD20260215144', 47, 7, '南区三食堂', '帮我带一份快餐，两荤一素', '13800138046', 18.00, 2, 5, '2026-02-15 00:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (145, 'ORD20260215145', 48, 8, '京东快递站', '取一个快递，送到西区47栋', '13800138047', 5.00, 2, 2, '2026-02-15 11:49:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (146, 'ORD20260215146', 49, 9, '图书馆打印室', '打印15份论文，装订', '13800138048', 22.00, 2, 3, '2026-02-14 20:21:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (147, 'ORD20260215147', 50, 10, '校园超市', '买一些日用品和零食，送到北区49栋', '13800138049', 50.00, 2, 4, '2026-02-15 03:44:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (148, 'ORD20260215148', 2, 11, '北区一食堂', '帮我带一份早餐，包子和粥', '13800138001', 10.00, 2, 5, '2026-02-14 14:58:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (149, 'ORD20260215149', 3, 12, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 2, 6, '2026-02-15 01:02:42', NULL, NULL, NULL, 1);
-INSERT INTO `order_info` VALUES (150, 'ORD20260215150', 4, 13, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 2, 3, '2026-02-14 17:41:42', NULL, NULL, NULL, 1);
+INSERT INTO `order_info` VALUES (1, 'ORD20260215001', 2, NULL, '北区食堂门口', '帮我带一份黄焖鸡米饭，微辣', '13800138001', 18.50, 0, 5, '2026-02-14 20:55:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (2, 'ORD20260215002', 3, NULL, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 0, 6, '2026-02-15 09:17:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (3, 'ORD20260215003', 4, NULL, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 0, 3, '2026-02-14 17:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (4, 'ORD20260215004', 5, NULL, '东区超市', '买两瓶矿泉水和一包纸巾，送到东区5栋', '13800138004', 12.00, 0, 4, '2026-02-14 18:46:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (5, 'ORD20260215005', 6, NULL, '西区校门', '帮我把这份文件送到行政楼教务处', '13800138005', 8.00, 0, 1, '2026-02-15 04:05:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (6, 'ORD20260215006', 7, NULL, '北区1栋楼下', '取一个圆通快递，送到北区7栋', '13800138006', 3.00, 0, 2, '2026-02-14 21:31:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (7, 'ORD20260215007', 8, NULL, '南区二食堂', '帮我带一份糖醋排骨饭，不要香菜', '13800138007', 16.80, 0, 5, '2026-02-15 08:45:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (8, 'ORD20260215008', 9, 2, '菜鸟驿站', '取两个快递，都是中通的，送到北区9栋', '13800138008', 6.00, 1, 6, '2026-02-15 12:35:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (9, 'ORD20260215009', 10, NULL, '教学楼A座', '打印100份PPT，彩色单面', '13800138009', 50.00, 0, 3, '2026-02-14 22:05:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (10, 'ORD20260215010', 11, NULL, '校园超市', '买一箱牛奶和一些零食，送到南区11栋', '13800138010', 65.00, 0, 4, '2026-02-15 10:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (11, 'ORD20260215011', 12, NULL, '北区三食堂', '帮我带一份兰州拉面，加蛋', '13800138011', 14.00, 0, 5, '2026-02-14 17:17:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (12, 'ORD20260215012', 13, NULL, '顺丰快递点', '取一个大件快递，送到东区13栋', '13800138012', 10.00, 0, 6, '2026-02-14 17:45:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (13, 'ORD20260215013', 14, NULL, '图书馆打印室', '打印20份论文，装订成册', '13800138013', 30.00, 0, 3, '2026-02-14 22:18:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (14, 'ORD20260215014', 15, NULL, '西区水果店', '买一些苹果和香蕉，送到西区15栋', '13800138014', 25.00, 0, 4, '2026-02-14 19:37:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (15, 'ORD20260215015', 16, NULL, '南区一食堂', '帮我带一份麻辣香锅，微辣', '13800138015', 22.00, 0, 5, '2026-02-14 16:35:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (16, 'ORD20260215016', 17, NULL, '韵达快递站', '取一个快递，送到北区17栋', '13800138016', 4.00, 0, 2, '2026-02-15 09:27:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (17, 'ORD20260215017', 18, NULL, '教学楼B座', '打印30份作业，双面打印', '13800138017', 9.00, 0, 3, '2026-02-15 06:53:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (18, 'ORD20260215018', 19, NULL, '校园便利店', '买一些日用品，送到南区19栋', '13800138018', 45.00, 0, 4, '2026-02-14 15:27:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (19, 'ORD20260215019', 20, NULL, '北区二食堂', '帮我带一份盖浇饭，土豆牛肉', '13800138019', 15.00, 0, 5, '2026-02-14 18:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (20, 'ORD20260215020', 21, NULL, '申通快递点', '取两个快递，送到东区21栋', '13800138020', 7.00, 0, 6, '2026-02-15 05:09:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (21, 'ORD20260215021', 22, NULL, '图书馆', '帮我占一个座位，靠窗的位置', '13800138021', 5.00, 0, 1, '2026-02-15 05:06:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (22, 'ORD20260215022', 23, NULL, '南区三食堂', '帮我带一份麻辣烫，不要麻不要辣', '13800138022', 18.00, 0, 5, '2026-02-14 19:24:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (23, 'ORD20260215023', 24, NULL, '京东快递站', '取一个快递，送到西区23栋', '13800138023', 4.00, 0, 2, '2026-02-14 19:04:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (24, 'ORD20260215024', 25, NULL, '打印店', '打印一张海报，A3彩色', '13800138024', 20.00, 0, 3, '2026-02-14 22:34:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (25, 'ORD20260215025', 26, NULL, '校园超市', '买一些饮料和零食，送到北区25栋', '13800138025', 35.00, 0, 4, '2026-02-14 17:01:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (26, 'ORD20260215026', 27, NULL, '北区一食堂', '帮我带一份包子和豆浆', '13800138026', 8.00, 0, 5, '2026-02-15 02:48:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (27, 'ORD20260215027', 28, NULL, '圆通快递站', '取一个快递，送到南区27栋', '13800138027', 3.00, 0, 6, '2026-02-14 20:21:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (28, 'ORD20260215028', 29, NULL, '教学楼C座', '打印50份试卷，单面黑白', '13800138028', 25.00, 0, 3, '2026-02-15 06:43:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (29, 'ORD20260215029', 30, NULL, '水果店', '买一个西瓜，送到东区29栋', '13800138029', 30.00, 0, 4, '2026-02-15 05:57:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (30, 'ORD20260215030', 31, NULL, '南区二食堂', '帮我带一份炒饭，加火腿肠', '13800138030', 12.00, 0, 5, '2026-02-14 18:58:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (31, 'ORD20260215031', 32, 1, '中通快递站', '取一个快递，送到西区31栋', '13800138031', 4.00, 1, 2, '2026-02-15 14:24:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (32, 'ORD20260215032', 33, NULL, '图书馆打印室', '打印10份简历，彩色', '13800138032', 15.00, 0, 3, '2026-02-15 00:27:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (33, 'ORD20260215033', 34, NULL, '校园超市', '买一些学习用品，送到北区33栋', '13800138033', 28.00, 0, 4, '2026-02-14 16:27:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (34, 'ORD20260215034', 35, NULL, '北区三食堂', '帮我带一份水饺，猪肉馅的', '13800138034', 16.00, 0, 5, '2026-02-14 18:19:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (35, 'ORD20260215035', 36, NULL, '韵达快递站', '取两个快递，送到南区35栋', '13800138035', 6.00, 0, 6, '2026-02-15 03:36:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (36, 'ORD20260215036', 37, NULL, '教学楼A座', '打印20份课件，双面打印', '13800138036', 8.00, 0, 3, '2026-02-14 20:28:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (37, 'ORD20260215037', 38, NULL, '便利店', '买一些零食和饮料，送到东区37栋', '13800138037', 40.00, 0, 4, '2026-02-15 04:54:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (38, 'ORD20260215038', 39, NULL, '南区一食堂', '帮我带一份套餐，一荤一素', '13800138038', 14.00, 0, 5, '2026-02-14 20:31:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (39, 'ORD20260215039', 40, NULL, '顺丰快递点', '取一个快递，送到西区39栋', '13800138039', 5.00, 0, 2, '2026-02-15 01:16:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (40, 'ORD20260215040', 41, NULL, '打印店', '打印一张证件照，一寸', '13800138040', 15.00, 0, 3, '2026-02-15 02:08:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (41, 'ORD20260215041', 42, NULL, '校园超市', '买一些水果和牛奶，送到北区41栋', '13800138041', 55.00, 0, 4, '2026-02-14 16:18:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (42, 'ORD20260215042', 43, NULL, '北区二食堂', '帮我带一份面条，加煎蛋', '13800138042', 13.00, 0, 5, '2026-02-15 12:31:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (43, 'ORD20260215043', 44, NULL, '申通快递站', '取一个快递，送到南区43栋', '13800138043', 4.00, 0, 6, '2026-02-14 23:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (44, 'ORD20260215044', 45, NULL, '教学楼B座', '打印40份资料，单面打印', '13800138044', 12.00, 0, 3, '2026-02-14 15:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (45, 'ORD20260215045', 46, NULL, '水果店', '买一些草莓，送到东区45栋', '13800138045', 35.00, 0, 4, '2026-02-14 15:29:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (46, 'ORD20260215046', 47, NULL, '南区三食堂', '帮我带一份快餐，两荤一素', '13800138046', 18.00, 0, 5, '2026-02-14 17:40:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (47, 'ORD20260215047', 48, NULL, '京东快递站', '取一个快递，送到西区47栋', '13800138047', 5.00, 0, 2, '2026-02-15 03:17:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (48, 'ORD20260215048', 49, NULL, '图书馆打印室', '打印15份论文，装订', '13800138048', 22.00, 0, 3, '2026-02-14 20:49:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (49, 'ORD20260215049', 50, NULL, '校园超市', '买一些日用品和零食，送到北区49栋', '13800138049', 50.00, 0, 4, '2026-02-15 07:35:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (50, 'ORD20260215050', 2, NULL, '北区一食堂', '帮我带一份早餐，包子和粥', '13800138001', 10.00, 0, 5, '2026-02-15 08:54:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (51, 'ORD20260215051', 3, 10, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 1, 6, '2026-02-15 07:09:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (52, 'ORD20260215052', 4, 11, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 1, 3, '2026-02-14 18:27:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (53, 'ORD20260215053', 5, 12, '东区超市', '买两瓶矿泉水和一包纸巾，送到东区5栋', '13800138004', 12.00, 1, 4, '2026-02-15 08:12:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (54, 'ORD20260215054', 6, 13, '西区校门', '帮我把这份文件送到行政楼教务处', '13800138005', 8.00, 1, 1, '2026-02-14 19:03:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (55, 'ORD20260215055', 7, 14, '北区1栋楼下', '取一个圆通快递，送到北区7栋', '13800138006', 3.00, 1, 2, '2026-02-15 07:59:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (56, 'ORD20260215056', 8, 15, '南区二食堂', '帮我带一份糖醋排骨饭，不要香菜', '13800138007', 16.80, 1, 5, '2026-02-14 16:13:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (57, 'ORD20260215057', 9, 16, '菜鸟驿站', '取两个快递，都是中通的，送到北区9栋', '13800138008', 6.00, 1, 6, '2026-02-14 18:29:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (58, 'ORD20260215058', 10, 17, '教学楼A座', '打印100份PPT，彩色单面', '13800138009', 50.00, 1, 3, '2026-02-15 05:11:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (59, 'ORD20260215059', 11, 18, '校园超市', '买一箱牛奶和一些零食，送到南区11栋', '13800138010', 65.00, 1, 4, '2026-02-15 03:50:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (60, 'ORD20260215060', 12, 19, '北区三食堂', '帮我带一份兰州拉面，加蛋', '13800138011', 14.00, 1, 5, '2026-02-15 13:03:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (61, 'ORD20260215061', 13, 20, '顺丰快递点', '取一个大件快递，送到东区13栋', '13800138012', 10.00, 1, 6, '2026-02-14 15:07:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (62, 'ORD20260215062', 14, 21, '图书馆打印室', '打印20份论文，装订成册', '13800138013', 30.00, 1, 3, '2026-02-14 21:50:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (63, 'ORD20260215063', 15, 22, '西区水果店', '买一些苹果和香蕉，送到西区15栋', '13800138014', 25.00, 1, 4, '2026-02-15 01:12:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (64, 'ORD20260215064', 16, 23, '南区一食堂', '帮我带一份麻辣香锅，微辣', '13800138015', 22.00, 1, 5, '2026-02-14 21:56:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (65, 'ORD20260215065', 17, 24, '韵达快递站', '取一个快递，送到北区17栋', '13800138016', 4.00, 1, 2, '2026-02-14 19:25:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (66, 'ORD20260215066', 18, 25, '教学楼B座', '打印30份作业，双面打印', '13800138017', 9.00, 1, 3, '2026-02-14 16:39:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (67, 'ORD20260215067', 19, 26, '校园便利店', '买一些日用品，送到南区19栋', '13800138018', 45.00, 1, 4, '2026-02-15 10:26:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (68, 'ORD20260215068', 20, 27, '北区二食堂', '帮我带一份盖浇饭，土豆牛肉', '13800138019', 15.00, 1, 5, '2026-02-15 11:36:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (69, 'ORD20260215069', 21, 28, '申通快递点', '取两个快递，送到东区21栋', '13800138020', 7.00, 1, 6, '2026-02-15 12:05:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (70, 'ORD20260215070', 22, 29, '图书馆', '帮我占一个座位，靠窗的位置', '13800138021', 5.00, 1, 1, '2026-02-15 11:01:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (71, 'ORD20260215071', 23, 30, '南区三食堂', '帮我带一份麻辣烫，不要麻不要辣', '13800138022', 18.00, 1, 5, '2026-02-15 04:14:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (72, 'ORD20260215072', 24, 31, '京东快递站', '取一个快递，送到西区23栋', '13800138023', 4.00, 1, 2, '2026-02-14 21:30:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (73, 'ORD20260215073', 25, 32, '打印店', '打印一张海报，A3彩色', '13800138024', 20.00, 1, 3, '2026-02-15 08:14:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (74, 'ORD20260215074', 26, 33, '校园超市', '买一些饮料和零食，送到北区25栋', '13800138025', 35.00, 1, 4, '2026-02-15 10:00:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (75, 'ORD20260215075', 27, 34, '北区一食堂', '帮我带一份包子和豆浆', '13800138026', 8.00, 1, 5, '2026-02-15 10:44:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (76, 'ORD20260215076', 28, 35, '圆通快递站', '取一个快递，送到南区27栋', '13800138027', 3.00, 1, 6, '2026-02-15 09:04:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (77, 'ORD20260215077', 29, 36, '教学楼C座', '打印50份试卷，单面黑白', '13800138028', 25.00, 1, 3, '2026-02-14 22:28:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (78, 'ORD20260215078', 30, 37, '水果店', '买一个西瓜，送到东区29栋', '13800138029', 30.00, 1, 4, '2026-02-14 22:35:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (79, 'ORD20260215079', 31, 38, '南区二食堂', '帮我带一份炒饭，加火腿肠', '13800138030', 12.00, 1, 5, '2026-02-15 06:55:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (80, 'ORD20260215080', 32, 39, '中通快递站', '取一个快递，送到西区31栋', '13800138031', 4.00, 1, 2, '2026-02-15 00:11:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (81, 'ORD20260215081', 33, 40, '图书馆打印室', '打印10份简历，彩色', '13800138032', 15.00, 1, 3, '2026-02-15 13:34:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (82, 'ORD20260215082', 34, 41, '校园超市', '买一些学习用品，送到北区33栋', '13800138033', 28.00, 1, 4, '2026-02-15 04:42:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (83, 'ORD20260215083', 35, 42, '北区三食堂', '帮我带一份水饺，猪肉馅的', '13800138034', 16.00, 1, 5, '2026-02-14 16:12:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (84, 'ORD20260215084', 36, 43, '韵达快递站', '取两个快递，送到南区35栋', '13800138035', 6.00, 1, 6, '2026-02-15 04:17:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (85, 'ORD20260215085', 37, 44, '教学楼A座', '打印20份课件，双面打印', '13800138036', 8.00, 1, 3, '2026-02-15 06:13:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (86, 'ORD20260215086', 38, 45, '便利店', '买一些零食和饮料，送到东区37栋', '13800138037', 40.00, 1, 4, '2026-02-15 03:38:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (87, 'ORD20260215087', 39, 46, '南区一食堂', '帮我带一份套餐，一荤一素', '13800138038', 14.00, 1, 5, '2026-02-15 08:56:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (88, 'ORD20260215088', 40, 47, '顺丰快递点', '取一个快递，送到西区39栋', '13800138039', 5.00, 1, 2, '2026-02-14 19:06:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (89, 'ORD20260215089', 41, 48, '打印店', '打印一张证件照，一寸', '13800138040', 15.00, 1, 3, '2026-02-15 06:07:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (90, 'ORD20260215090', 42, 49, '校园超市', '买一些水果和牛奶，送到北区41栋', '13800138041', 55.00, 1, 4, '2026-02-15 06:41:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (91, 'ORD20260215091', 43, 2, '北区二食堂', '帮我带一份面条，加煎蛋', '13800138042', 13.00, 1, 5, '2026-02-15 00:29:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (92, 'ORD20260215092', 44, 3, '申通快递站', '取一个快递，送到南区43栋', '13800138043', 4.00, 1, 6, '2026-02-14 15:42:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (93, 'ORD20260215093', 45, 4, '教学楼B座', '打印40份资料，单面打印', '13800138044', 12.00, 1, 3, '2026-02-15 14:29:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (94, 'ORD20260215094', 46, 5, '水果店', '买一些草莓，送到东区45栋', '13800138045', 35.00, 1, 4, '2026-02-15 10:42:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (95, 'ORD20260215095', 47, 6, '南区三食堂', '帮我带一份快餐，两荤一素', '13800138046', 18.00, 1, 5, '2026-02-14 19:26:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (96, 'ORD20260215096', 48, 7, '京东快递站', '取一个快递，送到西区47栋', '13800138047', 5.00, 1, 2, '2026-02-15 02:28:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (97, 'ORD20260215097', 49, 8, '图书馆打印室', '打印15份论文，装订', '13800138048', 22.00, 1, 3, '2026-02-15 11:24:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (98, 'ORD20260215098', 50, 9, '校园超市', '买一些日用品和零食，送到北区49栋', '13800138049', 50.00, 1, 4, '2026-02-15 11:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (99, 'ORD20260215099', 2, 10, '北区一食堂', '帮我带一份早餐，包子和粥', '13800138001', 10.00, 1, 5, '2026-02-15 06:22:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (100, 'ORD20260215100', 3, 11, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 1, 6, '2026-02-15 08:05:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (101, 'ORD20260215101', 4, 12, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 2, 3, '2026-02-15 06:45:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (102, 'ORD20260215102', 5, 13, '东区超市', '买两瓶矿泉水和一包纸巾，送到东区5栋', '13800138004', 12.00, 2, 4, '2026-02-14 18:54:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (103, 'ORD20260215103', 6, 14, '西区校门', '帮我把这份文件送到行政楼教务处', '13800138005', 8.00, 2, 1, '2026-02-15 11:35:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (104, 'ORD20260215104', 7, 15, '北区1栋楼下', '取一个圆通快递，送到北区7栋', '13800138006', 3.00, 2, 2, '2026-02-15 10:40:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (105, 'ORD20260215105', 8, 16, '南区二食堂', '帮我带一份糖醋排骨饭，不要香菜', '13800138007', 16.80, 2, 5, '2026-02-15 03:56:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (106, 'ORD20260215106', 9, 17, '菜鸟驿站', '取两个快递，都是中通的，送到北区9栋', '13800138008', 6.00, 2, 6, '2026-02-14 21:03:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (107, 'ORD20260215107', 10, 18, '教学楼A座', '打印100份PPT，彩色单面', '13800138009', 50.00, 2, 3, '2026-02-15 06:51:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (108, 'ORD20260215108', 11, 19, '校园超市', '买一箱牛奶和一些零食，送到南区11栋', '13800138010', 65.00, 2, 4, '2026-02-15 04:29:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (109, 'ORD20260215109', 12, 20, '北区三食堂', '帮我带一份兰州拉面，加蛋', '13800138011', 14.00, 2, 5, '2026-02-15 11:15:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (110, 'ORD20260215110', 13, 21, '顺丰快递点', '取一个大件快递，送到东区13栋', '13800138012', 10.00, 2, 6, '2026-02-15 04:11:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (111, 'ORD20260215111', 14, 22, '图书馆打印室', '打印20份论文，装订成册', '13800138013', 30.00, 2, 3, '2026-02-14 20:36:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (112, 'ORD20260215112', 15, 23, '西区水果店', '买一些苹果和香蕉，送到西区15栋', '13800138014', 25.00, 2, 4, '2026-02-15 03:51:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (113, 'ORD20260215113', 16, 24, '南区一食堂', '帮我带一份麻辣香锅，微辣', '13800138015', 22.00, 2, 5, '2026-02-14 14:51:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (114, 'ORD20260215114', 17, 25, '韵达快递站', '取一个快递，送到北区17栋', '13800138016', 4.00, 2, 2, '2026-02-15 00:06:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (115, 'ORD20260215115', 18, 26, '教学楼B座', '打印30份作业，双面打印', '13800138017', 9.00, 2, 3, '2026-02-15 13:20:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (116, 'ORD20260215116', 19, 27, '校园便利店', '买一些日用品，送到南区19栋', '13800138018', 45.00, 2, 4, '2026-02-15 03:45:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (117, 'ORD20260215117', 20, 28, '北区二食堂', '帮我带一份盖浇饭，土豆牛肉', '13800138019', 15.00, 2, 5, '2026-02-15 12:08:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (118, 'ORD20260215118', 21, 29, '申通快递点', '取两个快递，送到东区21栋', '13800138020', 7.00, 2, 6, '2026-02-15 10:49:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (119, 'ORD20260215119', 22, 30, '图书馆', '帮我占一个座位，靠窗的位置', '13800138021', 5.00, 2, 1, '2026-02-15 03:04:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (120, 'ORD20260215120', 23, 31, '南区三食堂', '帮我带一份麻辣烫，不要麻不要辣', '13800138022', 18.00, 2, 5, '2026-02-14 16:15:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (121, 'ORD20260215121', 24, 32, '京东快递站', '取一个快递，送到西区23栋', '13800138023', 4.00, 2, 2, '2026-02-15 09:28:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (122, 'ORD20260215122', 25, 33, '打印店', '打印一张海报，A3彩色', '13800138024', 20.00, 2, 3, '2026-02-15 07:58:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (123, 'ORD20260215123', 26, 34, '校园超市', '买一些饮料和零食，送到北区25栋', '13800138025', 35.00, 2, 4, '2026-02-14 20:48:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (124, 'ORD20260215124', 27, 35, '北区一食堂', '帮我带一份包子和豆浆', '13800138026', 8.00, 2, 5, '2026-02-14 17:31:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (125, 'ORD20260215125', 28, 36, '圆通快递站', '取一个快递，送到南区27栋', '13800138027', 3.00, 2, 6, '2026-02-15 10:34:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (126, 'ORD20260215126', 29, 37, '教学楼C座', '打印50份试卷，单面黑白', '13800138028', 25.00, 2, 3, '2026-02-15 09:39:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (127, 'ORD20260215127', 30, 38, '水果店', '买一个西瓜，送到东区29栋', '13800138029', 30.00, 2, 4, '2026-02-15 01:57:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (128, 'ORD20260215128', 31, 39, '南区二食堂', '帮我带一份炒饭，加火腿肠', '13800138030', 12.00, 2, 5, '2026-02-15 14:11:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (129, 'ORD20260215129', 32, 40, '中通快递站', '取一个快递，送到西区31栋', '13800138031', 4.00, 2, 2, '2026-02-15 02:27:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (130, 'ORD20260215130', 33, 41, '图书馆打印室', '打印10份简历，彩色', '13800138032', 15.00, 2, 3, '2026-02-15 03:06:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (131, 'ORD20260215131', 34, 42, '校园超市', '买一些学习用品，送到北区33栋', '13800138033', 28.00, 2, 4, '2026-02-14 17:32:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (132, 'ORD20260215132', 35, 43, '北区三食堂', '帮我带一份水饺，猪肉馅的', '13800138034', 16.00, 2, 5, '2026-02-14 15:47:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (133, 'ORD20260215133', 36, 44, '韵达快递站', '取两个快递，送到南区35栋', '13800138035', 6.00, 2, 6, '2026-02-15 11:40:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (134, 'ORD20260215134', 37, 45, '教学楼A座', '打印20份课件，双面打印', '13800138036', 8.00, 2, 3, '2026-02-14 20:24:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (135, 'ORD20260215135', 38, 46, '便利店', '买一些零食和饮料，送到东区37栋', '13800138037', 40.00, 2, 4, '2026-02-15 04:23:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (136, 'ORD20260215136', 39, 47, '南区一食堂', '帮我带一份套餐，一荤一素', '13800138038', 14.00, 2, 5, '2026-02-14 18:05:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (137, 'ORD20260215137', 40, 48, '顺丰快递点', '取一个快递，送到西区39栋', '13800138039', 5.00, 2, 2, '2026-02-14 14:43:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (138, 'ORD20260215138', 41, 49, '打印店', '打印一张证件照，一寸', '13800138040', 15.00, 2, 3, '2026-02-15 04:40:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (139, 'ORD20260215139', 42, 2, '校园超市', '买一些水果和牛奶，送到北区41栋', '13800138041', 55.00, 2, 4, '2026-02-15 12:35:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (140, 'ORD20260215140', 43, 3, '北区二食堂', '帮我带一份面条，加煎蛋', '13800138042', 13.00, 2, 5, '2026-02-15 10:21:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (141, 'ORD20260215141', 44, 4, '申通快递站', '取一个快递，送到南区43栋', '13800138043', 4.00, 2, 6, '2026-02-14 23:22:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (142, 'ORD20260215142', 45, 5, '教学楼B座', '打印40份资料，单面打印', '13800138044', 12.00, 2, 3, '2026-02-14 23:12:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (143, 'ORD20260215143', 46, 6, '水果店', '买一些草莓，送到东区45栋', '13800138045', 35.00, 2, 4, '2026-02-15 07:15:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (144, 'ORD20260215144', 47, 7, '南区三食堂', '帮我带一份快餐，两荤一素', '13800138046', 18.00, 2, 5, '2026-02-15 00:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (145, 'ORD20260215145', 48, 8, '京东快递站', '取一个快递，送到西区47栋', '13800138047', 5.00, 2, 2, '2026-02-15 11:49:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (146, 'ORD20260215146', 49, 9, '图书馆打印室', '打印15份论文，装订', '13800138048', 22.00, 2, 3, '2026-02-14 20:21:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (147, 'ORD20260215147', 50, 10, '校园超市', '买一些日用品和零食，送到北区49栋', '13800138049', 50.00, 2, 4, '2026-02-15 03:44:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (148, 'ORD20260215148', 2, 11, '北区一食堂', '帮我带一份早餐，包子和粥', '13800138001', 10.00, 2, 5, '2026-02-14 14:58:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (149, 'ORD20260215149', 3, 12, '南区快递站', '取一个顺丰快递，送到南区3栋', '13800138002', 5.00, 2, 6, '2026-02-15 01:02:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (150, 'ORD20260215150', 4, 13, '图书馆二楼', '打印50份复习资料，双面黑白', '13800138003', 15.00, 2, 3, '2026-02-14 17:41:42', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (151, 'ORD1771376151154A4B19847', 1, 2, '北京市海淀区中关村大街1号', '快递单号19-22222', '18104417838', 3.00, 1, 6, '2026-02-18 08:55:51', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (152, 'ORD17713770280772ECA4835', 1, 2, '四公寓男寝227', '下午综D705第一节课', '18104417838', 20.00, 1, 2, '2026-02-18 09:10:28', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (153, 'ORD177174939598767FD3588', 51, 51, '四公寓男寝227', '无', '18104417838', 20.00, 2, 2, '2026-02-22 16:36:36', NULL, NULL, NULL, 1, 0, 0);
+INSERT INTO `order_info` VALUES (154, 'ORD1771750623097C6795873', 51, NULL, '四公寓男寝227', '1', '18104417838', 20.00, 3, 2, '2026-02-22 16:57:03', NULL, NULL, NULL, 1, 0, 0);
 
 -- ----------------------------
 -- Table structure for order_type
@@ -472,7 +483,7 @@ CREATE TABLE `post_image`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_img_post`(`post_id` ASC) USING BTREE,
   CONSTRAINT `fk_img_post` FOREIGN KEY (`post_id`) REFERENCES `post_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '帖子图片表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '帖子图片表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of post_image
@@ -497,9 +508,9 @@ CREATE TABLE `post_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_post_user`(`user_id` ASC) USING BTREE,
   INDEX `idx_post_type`(`type_id` ASC) USING BTREE,
-  CONSTRAINT `fk_post_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `fk_post_type` FOREIGN KEY (`type_id`) REFERENCES `post_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 50 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '帖子信息表' ROW_FORMAT = DYNAMIC;
+  CONSTRAINT `fk_post_type` FOREIGN KEY (`type_id`) REFERENCES `post_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_post_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 52 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '帖子信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of post_info
@@ -520,7 +531,7 @@ INSERT INTO `post_info` VALUES (13, 14, '出售二手吉他', '有一把二手�
 INSERT INTO `post_info` VALUES (14, 15, '校园活动分享', '最近学校有什么有趣的活动吗？大家分享一下。', 298, 11, '2026-02-13 07:13:42', '2026-02-17 22:17:08', 2, NULL, 1);
 INSERT INTO `post_info` VALUES (15, 16, '求问考研备考经验', '准备考研，大家有什么备考经验和建议吗？', 612, 25, '2026-02-14 23:41:42', '2026-02-17 22:17:08', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (16, 17, '出售二手自行车', '有一辆二手自行车想出售，价格便宜，需要的联系。', 245, 8, '2026-02-12 10:09:42', '2026-02-17 22:17:08', 3, NULL, 1);
-INSERT INTO `post_info` VALUES (17, 18, '求问学校附近哪里有健身房', '想健身，学校附近有什么好的健身房推荐吗？', 189, 6, '2026-02-15 13:05:42', '2026-02-17 22:17:08', 1, NULL, 1);
+INSERT INTO `post_info` VALUES (17, 18, '求问学校附近哪里有健身房', '想健身，学校附近有什么好的健身房推荐吗？', 196, 6, '2026-02-15 13:05:42', '2026-02-18 09:25:28', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (18, 19, '校园学习分享', '分享一些学习方法和技巧，希望对大家有帮助。', 356, 14, '2026-02-10 20:24:42', '2026-02-17 22:17:08', 2, NULL, 1);
 INSERT INTO `post_info` VALUES (19, 20, '求组队参加篮球赛', '想组队参加学校的篮球赛，有兴趣的同学联系我。', 223, 7, '2026-02-13 00:09:42', '2026-02-17 22:17:08', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (20, 21, '出售二手电脑', '有一台二手笔记本电脑想出售，配置不错，价格面议。', 412, 13, '2026-02-09 20:56:42', '2026-02-17 22:17:08', 3, NULL, 1);
@@ -534,7 +545,7 @@ INSERT INTO `post_info` VALUES (27, 28, '求组队参加英语演讲比赛', '�
 INSERT INTO `post_info` VALUES (28, 29, '出售二手手机', '有一部二手手机想出售，价格面议，有兴趣的联系。', 398, 14, '2026-02-14 04:25:42', '2026-02-17 22:17:08', 3, NULL, 1);
 INSERT INTO `post_info` VALUES (29, 30, '求问学校附近哪里有超市', '想买些东西，学校附近有什么大的超市吗？', 167, 5, '2026-02-10 19:00:42', '2026-02-17 22:17:08', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (30, 31, '校园音乐分享', '分享一些我喜欢的音乐，大家有什么好听的歌也推荐一下。', 423, 16, '2026-02-09 19:05:42', '2026-02-17 22:17:08', 2, NULL, 1);
-INSERT INTO `post_info` VALUES (31, 32, '求问公务员备考经验', '准备考公务员，大家有什么备考经验和建议吗？', 512, 20, '2026-02-14 23:52:42', '2026-02-17 22:17:08', 1, NULL, 1);
+INSERT INTO `post_info` VALUES (31, 32, '求问公务员备考经验', '准备考公务员，大家有什么备考经验和建议吗？', 514, 20, '2026-02-14 23:52:42', '2026-02-18 09:25:26', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (32, 33, '出售二手平板', '有一台二手平板想出售，价格便宜，需要的联系。', 289, 10, '2026-02-08 23:25:42', '2026-02-17 22:17:08', 3, NULL, 1);
 INSERT INTO `post_info` VALUES (33, 34, '求问学校附近哪里有药店', '身体不舒服，想买点药，学校附近有药店吗？', 145, 4, '2026-02-12 06:54:42', '2026-02-17 22:17:08', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (34, 35, '校园电影分享', '最近看了一部好看的电影，推荐给大家。', 367, 13, '2026-02-11 21:39:42', '2026-02-17 22:17:08', 2, NULL, 1);
@@ -553,6 +564,8 @@ INSERT INTO `post_info` VALUES (46, 47, '校园读书分享', '最近读了一�
 INSERT INTO `post_info` VALUES (47, 48, '求问雅思备考经验', '准备考雅思，大家有什么备考经验和建议吗？', 567, 23, '2026-02-14 19:14:42', '2026-02-17 22:17:08', 1, NULL, 1);
 INSERT INTO `post_info` VALUES (48, 49, '出售二手鼠标', '有一个二手鼠标想出售，价格便宜，需要的联系。', 198, 7, '2026-02-10 12:13:42', '2026-02-17 22:17:08', 3, NULL, 1);
 INSERT INTO `post_info` VALUES (49, 50, '求问学校附近哪里有蛋糕店', '想买蛋糕，学校附近有什么好的蛋糕店推荐吗？', 145, 5, '2026-02-13 12:48:42', '2026-02-17 22:17:08', 1, NULL, 1);
+INSERT INTO `post_info` VALUES (50, 2, '大家好我是李远', '1111111111', 34, 2, '2026-02-18 10:22:02', '2026-02-22 16:51:10', 2, NULL, 1);
+INSERT INTO `post_info` VALUES (51, 51, '111', '大家好我是李远', 0, 0, '2026-02-22 18:17:07', '2026-02-22 18:17:07', 2, NULL, 1);
 
 -- ----------------------------
 -- Table structure for post_type
@@ -592,11 +605,24 @@ CREATE TABLE `private_message`  (
   CONSTRAINT `fk_msg_conv` FOREIGN KEY (`conversation_id`) REFERENCES `conversation` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `fk_msg_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `fk_msg_sender` FOREIGN KEY (`sender_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '私聊消息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '私聊消息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of private_message
 -- ----------------------------
+INSERT INTO `private_message` VALUES (1, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:14:17');
+INSERT INTO `private_message` VALUES (2, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:14:28');
+INSERT INTO `private_message` VALUES (3, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:28:32');
+INSERT INTO `private_message` VALUES (4, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:28:38');
+INSERT INTO `private_message` VALUES (5, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:33:29');
+INSERT INTO `private_message` VALUES (6, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:33:36');
+INSERT INTO `private_message` VALUES (7, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:35:49');
+INSERT INTO `private_message` VALUES (8, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:42:13');
+INSERT INTO `private_message` VALUES (9, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:42:32');
+INSERT INTO `private_message` VALUES (10, 1, 51, 2, '你好', 1, 0, '2026-02-19 13:42:57');
+INSERT INTO `private_message` VALUES (11, 1, 51, 2, '你好', 1, 0, '2026-02-21 16:31:50');
+INSERT INTO `private_message` VALUES (12, 1, 51, 2, '你好', 1, 0, '2026-02-21 16:38:43');
+INSERT INTO `private_message` VALUES (13, 1, 51, 2, '你好', 1, 0, '2026-02-21 16:41:54');
 
 -- ----------------------------
 -- Table structure for user_address
@@ -613,11 +639,12 @@ CREATE TABLE `user_address`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_addr_user`(`user_id` ASC) USING BTREE,
   CONSTRAINT `fk_addr_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户地址表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户地址表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_address
 -- ----------------------------
+INSERT INTO `user_address` VALUES (1, 2, '李远', '18104417838', '四公寓男寝227', 1, '2026-02-18 09:09:44');
 
 -- ----------------------------
 -- Table structure for user_info
@@ -629,69 +656,75 @@ CREATE TABLE `user_info`  (
   `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户昵称',
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户密码',
   `phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户手机号(11位)',
-  `permission` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户权限：0-普通用户 1-管理员',
+  `campus_id` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '校区ID',
   `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户收货地址',
   `deleted_at` datetime NULL DEFAULT NULL COMMENT '删除时间（NULL表示未删除）',
+  `role` int NULL DEFAULT 1 COMMENT '角色: 0-被限制, 1-普通用户, 2-VIP, 3-管理员, 4-超级管理员',
+  `created_at` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `account_balance` decimal(10, 2) NULL DEFAULT 0.00 COMMENT '账户余额',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_account`(`account` ASC) USING BTREE,
   UNIQUE INDEX `uk_phone`(`phone` ASC) USING BTREE,
+  INDEX `fk_user_campus`(`campus_id` ASC) USING BTREE,
+  CONSTRAINT `fk_user_campus` FOREIGN KEY (`campus_id`) REFERENCES `campus_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `ck_account_format` CHECK (regexp_like(`account`,_utf8mb4'^[a-zA-Z0-9_-]+$'))
-) ENGINE = InnoDB AUTO_INCREMENT = 52 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 53 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_info
 -- ----------------------------
-INSERT INTO `user_info` VALUES (1, 'admin', '系统管理员', 'admin123456', '13800000000', 1, '行政楼', NULL);
-INSERT INTO `user_info` VALUES (2, 'student001', '张同学', 'pass123456', '13800138001', 0, '北区1栋101', NULL);
-INSERT INTO `user_info` VALUES (3, 'student002', '李同学', 'pass123456', '13800138002', 0, '北区2栋202', NULL);
-INSERT INTO `user_info` VALUES (4, 'student003', '王同学', 'pass123456', '13800138003', 0, '南区3栋303', NULL);
-INSERT INTO `user_info` VALUES (5, 'student004', '刘同学', 'pass123456', '13800138004', 0, '南区4栋404', NULL);
-INSERT INTO `user_info` VALUES (6, 'student005', '陈同学', 'pass123456', '13800138005', 0, '东区5栋505', NULL);
-INSERT INTO `user_info` VALUES (7, 'student006', '杨同学', 'pass123456', '13800138006', 0, '东区6栋606', NULL);
-INSERT INTO `user_info` VALUES (8, 'student007', '赵同学', 'pass123456', '13800138007', 0, '西区7栋707', NULL);
-INSERT INTO `user_info` VALUES (9, 'student008', '周同学', 'pass123456', '13800138008', 0, '西区8栋808', NULL);
-INSERT INTO `user_info` VALUES (10, 'student009', '吴同学', 'pass123456', '13800138009', 0, '北区9栋909', NULL);
-INSERT INTO `user_info` VALUES (11, 'student010', '郑同学', 'pass123456', '13800138010', 0, '北区10栋1010', NULL);
-INSERT INTO `user_info` VALUES (12, 'student011', '孙同学', 'pass123456', '13800138011', 0, '南区11栋1111', NULL);
-INSERT INTO `user_info` VALUES (13, 'student012', '马同学', 'pass123456', '13800138012', 0, '南区12栋1212', NULL);
-INSERT INTO `user_info` VALUES (14, 'student013', '朱同学', 'pass123456', '13800138013', 0, '东区13栋1313', NULL);
-INSERT INTO `user_info` VALUES (15, 'student014', '胡同学', 'pass123456', '13800138014', 0, '东区14栋1414', NULL);
-INSERT INTO `user_info` VALUES (16, 'student015', '林同学', 'pass123456', '13800138015', 0, '西区15栋1515', NULL);
-INSERT INTO `user_info` VALUES (17, 'student016', '何同学', 'pass123456', '13800138016', 0, '西区16栋1616', NULL);
-INSERT INTO `user_info` VALUES (18, 'student017', '高同学', 'pass123456', '13800138017', 0, '北区17栋1717', NULL);
-INSERT INTO `user_info` VALUES (19, 'student018', '罗同学', 'pass123456', '13800138018', 0, '北区18栋1818', NULL);
-INSERT INTO `user_info` VALUES (20, 'student019', '谢同学', 'pass123456', '13800138019', 0, '南区19栋1919', NULL);
-INSERT INTO `user_info` VALUES (21, 'student020', '宋同学', 'pass123456', '13800138020', 0, '南区20栋2020', NULL);
-INSERT INTO `user_info` VALUES (22, 'student021', '唐同学', 'pass123456', '13800138021', 0, '东区21栋2121', NULL);
-INSERT INTO `user_info` VALUES (23, 'student022', '许同学', 'pass123456', '13800138022', 0, '东区22栋2222', NULL);
-INSERT INTO `user_info` VALUES (24, 'student023', '韩同学', 'pass123456', '13800138023', 0, '西区23栋2323', NULL);
-INSERT INTO `user_info` VALUES (25, 'student024', '冯同学', 'pass123456', '13800138024', 0, '西区24栋2424', NULL);
-INSERT INTO `user_info` VALUES (26, 'student025', '邓同学', 'pass123456', '13800138025', 0, '北区25栋2525', NULL);
-INSERT INTO `user_info` VALUES (27, 'student026', '曹同学', 'pass123456', '13800138026', 0, '北区26栋2626', NULL);
-INSERT INTO `user_info` VALUES (28, 'student027', '彭同学', 'pass123456', '13800138027', 0, '南区27栋2727', NULL);
-INSERT INTO `user_info` VALUES (29, 'student028', '曾同学', 'pass123456', '13800138028', 0, '南区28栋2828', NULL);
-INSERT INTO `user_info` VALUES (30, 'student029', '萧同学', 'pass123456', '13800138029', 0, '东区29栋2929', NULL);
-INSERT INTO `user_info` VALUES (31, 'student030', '田同学', 'pass123456', '13800138030', 0, '东区30栋3030', NULL);
-INSERT INTO `user_info` VALUES (32, 'student031', '董同学', 'pass123456', '13800138031', 0, '西区31栋3131', NULL);
-INSERT INTO `user_info` VALUES (33, 'student032', '袁同学', 'pass123456', '13800138032', 0, '西区32栋3232', NULL);
-INSERT INTO `user_info` VALUES (34, 'student033', '潘同学', 'pass123456', '13800138033', 0, '北区33栋3333', NULL);
-INSERT INTO `user_info` VALUES (35, 'student034', '于同学', 'pass123456', '13800138034', 0, '北区34栋3434', NULL);
-INSERT INTO `user_info` VALUES (36, 'student035', '蒋同学', 'pass123456', '13800138035', 0, '南区35栋3535', NULL);
-INSERT INTO `user_info` VALUES (37, 'student036', '蔡同学', 'pass123456', '13800138036', 0, '南区36栋3636', NULL);
-INSERT INTO `user_info` VALUES (38, 'student037', '余同学', 'pass123456', '13800138037', 0, '东区37栋3737', NULL);
-INSERT INTO `user_info` VALUES (39, 'student038', '杜同学', 'pass123456', '13800138038', 0, '东区38栋3838', NULL);
-INSERT INTO `user_info` VALUES (40, 'student039', '叶同学', 'pass123456', '13800138039', 0, '西区39栋3939', NULL);
-INSERT INTO `user_info` VALUES (41, 'student040', '程同学', 'pass123456', '13800138040', 0, '西区40栋4040', NULL);
-INSERT INTO `user_info` VALUES (42, 'student041', '苏同学', 'pass123456', '13800138041', 0, '北区41栋4141', NULL);
-INSERT INTO `user_info` VALUES (43, 'student042', '魏同学', 'pass123456', '13800138042', 0, '北区42栋4242', NULL);
-INSERT INTO `user_info` VALUES (44, 'student043', '吕同学', 'pass123456', '13800138043', 0, '南区43栋4343', NULL);
-INSERT INTO `user_info` VALUES (45, 'student044', '丁同学', 'pass123456', '13800138044', 0, '南区44栋4444', NULL);
-INSERT INTO `user_info` VALUES (46, 'student045', '任同学', 'pass123456', '13800138045', 0, '东区45栋4545', NULL);
-INSERT INTO `user_info` VALUES (47, 'student046', '沈同学', 'pass123456', '13800138046', 0, '东区46栋4646', NULL);
-INSERT INTO `user_info` VALUES (48, 'student047', '姚同学', 'pass123456', '13800138047', 0, '西区47栋4747', NULL);
-INSERT INTO `user_info` VALUES (49, 'student048', '卢同学', 'pass123456', '13800138048', 0, '西区48栋4848', NULL);
-INSERT INTO `user_info` VALUES (50, 'student049', '姜同学', 'pass123456', '13800138049', 0, '北区49栋4949', NULL);
-INSERT INTO `user_info` VALUES (51, 'wo258108048', 'wo258108048', '$2a$10$pL0Mgmj4UXFQjZBZzZnd3O4/iGeLmqMl1s7LUe3Miizj0htdJwKNa', '18104417838', 0, NULL, NULL);
+INSERT INTO `user_info` VALUES (1, 'admin', '系统管理员', 'admin123456', '13800000000', 1, '行政楼', NULL, 3, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (2, 'student001', '张同学', 'pass123456', '13800138001', 1, '北区1栋101', NULL, 3, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (3, 'student002', '李同学', 'pass123456', '13800138002', 1, '北区2栋202', NULL, 3, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (4, 'student003', '王同学', 'pass123456', '13800138003', 1, '南区3栋303', NULL, 3, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (5, 'student004', '刘同学', 'pass123456', '13800138004', 1, '南区4栋404', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (6, 'student005', '陈同学', 'pass123456', '13800138005', 1, '东区5栋505', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (7, 'student006', '杨同学', 'pass123456', '13800138006', 1, '东区6栋606', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (8, 'student007', '赵同学', 'pass123456', '13800138007', 1, '西区7栋707', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (9, 'student008', '周同学', 'pass123456', '13800138008', 1, '西区8栋808', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (10, 'student009', '吴同学', 'pass123456', '13800138009', 1, '北区9栋909', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (11, 'student010', '郑同学', 'pass123456', '13800138010', 1, '北区10栋1010', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (12, 'student011', '孙同学', 'pass123456', '13800138011', 1, '南区11栋1111', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (13, 'student012', '马同学', 'pass123456', '13800138012', 1, '南区12栋1212', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (14, 'student013', '朱同学', 'pass123456', '13800138013', 1, '东区13栋1313', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (15, 'student014', '胡同学', 'pass123456', '13800138014', 1, '东区14栋1414', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (16, 'student015', '林同学', 'pass123456', '13800138015', 1, '西区15栋1515', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (17, 'student016', '何同学', 'pass123456', '13800138016', 1, '西区16栋1616', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (18, 'student017', '高同学', 'pass123456', '13800138017', 1, '北区17栋1717', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (19, 'student018', '罗同学', 'pass123456', '13800138018', 1, '北区18栋1818', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (20, 'student019', '谢同学', 'pass123456', '13800138019', 1, '南区19栋1919', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (21, 'student020', '宋同学', 'pass123456', '13800138020', 1, '南区20栋2020', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (22, 'student021', '唐同学', 'pass123456', '13800138021', 1, '东区21栋2121', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (23, 'student022', '许同学', 'pass123456', '13800138022', 1, '东区22栋2222', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (24, 'student023', '韩同学', 'pass123456', '13800138023', 1, '西区23栋2323', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (25, 'student024', '冯同学', 'pass123456', '13800138024', 1, '西区24栋2424', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (26, 'student025', '邓同学', 'pass123456', '13800138025', 1, '北区25栋2525', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (27, 'student026', '曹同学', 'pass123456', '13800138026', 1, '北区26栋2626', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (28, 'student027', '彭同学', 'pass123456', '13800138027', 1, '南区27栋2727', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (29, 'student028', '曾同学', 'pass123456', '13800138028', 1, '南区28栋2828', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (30, 'student029', '萧同学', 'pass123456', '13800138029', 1, '东区29栋2929', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (31, 'student030', '田同学', 'pass123456', '13800138030', 1, '东区30栋3030', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (32, 'student031', '董同学', 'pass123456', '13800138031', 1, '西区31栋3131', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (33, 'student032', '袁同学', 'pass123456', '13800138032', 1, '西区32栋3232', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (34, 'student033', '潘同学', 'pass123456', '13800138033', 1, '北区33栋3333', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (35, 'student034', '于同学', 'pass123456', '13800138034', 1, '北区34栋3434', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (36, 'student035', '蒋同学', 'pass123456', '13800138035', 1, '南区35栋3535', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (37, 'student036', '蔡同学', 'pass123456', '13800138036', 1, '南区36栋3636', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (38, 'student037', '余同学', 'pass123456', '13800138037', 1, '东区37栋3737', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (39, 'student038', '杜同学', 'pass123456', '13800138038', 1, '东区38栋3838', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (40, 'student039', '叶同学', 'pass123456', '13800138039', 1, '西区39栋3939', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (41, 'student040', '程同学', 'pass123456', '13800138040', 1, '西区40栋4040', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (42, 'student041', '苏同学', 'pass123456', '13800138041', 1, '北区41栋4141', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (43, 'student042', '魏同学', 'pass123456', '13800138042', 1, '北区42栋4242', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (44, 'student043', '吕同学', 'pass123456', '13800138043', 1, '南区43栋4343', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (45, 'student044', '丁同学', 'pass123456', '13800138044', 1, '南区44栋4444', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (46, 'student045', '任同学', 'pass123456', '13800138045', 1, '东区45栋4545', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (47, 'student046', '沈同学', 'pass123456', '13800138046', 1, '东区46栋4646', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (48, 'student047', '姚同学', 'pass123456', '13800138047', 1, '西区47栋4747', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (49, 'student048', '卢同学', 'pass123456', '13800138048', 1, '西区48栋4848', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (50, 'student049', '姜同学', 'pass123456', '13800138049', 1, '北区49栋4949', NULL, 0, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (51, 'wo258108048', 'Lee', '$2a$10$pL0Mgmj4UXFQjZBZzZnd3O4/iGeLmqMl1s7LUe3Miizj0htdJwKNa', '18104417838', 1, NULL, NULL, 1, '2026-02-22 18:21:58', 0.00);
+INSERT INTO `user_info` VALUES (52, '123456', '超级管理员', '$2a$10$pL0Mgmj4UXFQjZBZzZnd3O4/iGeLmqMl1s7LUe3Miizj0htdJwKNa', '18104417837', 1, NULL, NULL, 4, '2026-02-22 18:21:58', 0.00);
 
 -- ----------------------------
 -- Table structure for user_stats

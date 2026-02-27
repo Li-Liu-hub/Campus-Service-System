@@ -6,6 +6,8 @@ import com.jsyl.entity.Post;
 import com.jsyl.result.PageResult;
 import com.jsyl.vo.PostDetailVO;
 
+import java.util.List;
+
 public interface PostService {
 
     void publish(PostPublishDTO postPublishDTO, Integer userId);
@@ -16,6 +18,10 @@ public interface PostService {
 
     void delete(Long id, Integer userId);
 
+    void deleteByAdmin(Long id);
+
     PageResult pageQuery(PostPageQueryDTO postPageQueryDTO);
+
+    List<Post> getMyPosts(Long userId);
 
 }

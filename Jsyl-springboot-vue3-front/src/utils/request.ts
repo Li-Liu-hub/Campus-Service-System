@@ -81,7 +81,6 @@ service.interceptors.request.use(
     if (!isLoginRequest) {
       const token = localStorage.getItem(TOKEN_KEY);
       if (token) {
-        config.headers['token'] = token;
         config.headers['authentication'] = token;
       }
     }

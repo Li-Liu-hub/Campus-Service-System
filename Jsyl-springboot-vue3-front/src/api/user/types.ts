@@ -24,6 +24,8 @@ export interface UserInfo {
   createdAt?: string;
   /** 账号更新时间 */
   updatedAt?: string;
+  /** 账户余额 */
+  accountBalance?: number;
 }
 
 /**

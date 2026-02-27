@@ -3,7 +3,7 @@
     <div v-loading="loading" class="post-detail-content">
       <ChatBox
         v-model:visible="chatBoxVisible"
-        :target-user-id="chatTargetUserId"
+        :target-user-id="chatTargetUserId ?? undefined"
         :target-nickname="chatTargetNickname"
         @close="closeChatBox"
       />

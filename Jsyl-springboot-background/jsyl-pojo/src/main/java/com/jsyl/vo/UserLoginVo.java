@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class UserLoginVo {
-    private long  id;
+    private long id;
 
     private String account;
 
     private String token;
+
+    private Integer role;
 }

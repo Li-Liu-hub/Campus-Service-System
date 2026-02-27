@@ -10,7 +10,8 @@ import {
   API_POST_DETAIL,
   API_POST_UPDATE,
   API_POST_DELETE,
-  API_POST_PAGE
+  API_POST_PAGE,
+  API_POST_MY_POSTS
 } from '@/constants/api';
 import type {
   PostPublishParams,
@@ -59,6 +60,10 @@ export function deletePost(id: number) {
  */
 export function getPostPage(params: PostPageQueryParams) {
   return get<PostPageResponse>(API_POST_PAGE, params);
+}
+
+export function getMyPosts() {
+  return get<Post[]>(API_POST_MY_POSTS);
 }
 
 export type { PostPublishParams, PostPageQueryParams, PostPageResponse, PostDetailVO, Post };

@@ -5,7 +5,7 @@ jsyl:
     port: 3306
     database: jsyl_ms
     username: root
-    password: your_password
+    password: 123456
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com

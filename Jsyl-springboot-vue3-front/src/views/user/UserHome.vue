@@ -6,7 +6,7 @@
     </div>
 
     <el-row :gutter="20" class="info-cards">
-      <el-col :xs="24" :md="12">
+      <el-col :xs="24" :md="6">
         <el-card class="time-card" shadow="hover">
           <div class="card-content">
             <div class="card-icon time-icon">
@@ -21,16 +21,43 @@
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :md="12">
-        <el-card class="weather-card" shadow="hover">
+      <el-col :xs="24" :md="6">
+        <el-card class="stat-card" shadow="hover">
           <div class="card-content">
-            <div class="card-icon weather-icon">
-              <el-icon :size="48"><Sunny /></el-icon>
+            <div class="card-icon order-icon">
+              <el-icon :size="48"><Document /></el-icon>
             </div>
             <div class="card-info">
-              <div class="card-title">今日天气</div>
-              <div class="weather-temp">23°C</div>
-              <div class="weather-desc">晴朗 · 微风</div>
+              <div class="card-title">我发起的订单</div>
+              <div class="card-value">{{ userStats.orderCount }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :md="6">
+        <el-card class="stat-card" shadow="hover">
+          <div class="card-content">
+            <div class="card-icon accept-icon">
+              <el-icon :size="48"><Money /></el-icon>
+            </div>
+            <div class="card-info">
+              <div class="card-title">我接受的订单</div>
+              <div class="card-value">{{ acceptedOrderCount }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :md="6">
+        <el-card class="stat-card" shadow="hover">
+          <div class="card-content">
+            <div class="card-icon post-icon">
+              <el-icon :size="48"><ChatDotRound /></el-icon>
+            </div>
+            <div class="card-info">
+              <div class="card-title">我发起的帖子</div>
+              <div class="card-value">{{ userStats.postCount }}</div>
             </div>
           </div>
         </el-card>
@@ -50,7 +77,7 @@
     </el-card>
 
     <el-row :gutter="20" class="content-section">
-      <el-col :xs="24" :lg="12">
+      <el-col :xs="24" :lg="8">
         <el-card class="section-card" shadow="hover">
           <template #header>
             <div class="card-header">
@@ -79,7 +106,37 @@
                   >
                     {{ getOrderStatusText(order.orderStatus) }}
                   </el-tag>
+                  <span v-if="order.requireTime" class="order-countdown">
+                    <el-icon :size="12"><Clock /></el-icon>
+                    {{ getCountdown(order.requireTime) }}
+                  </span>
                 </div>
+                <div class="order-users" v-if="order.acceptorId">
+                  <span class="user-label">接单人：</span>
+                  <span
+                    class="user-name"
+                    @click="goToChat(order.acceptorId!, order.acceptorNickname)"
+                  >
+                    {{ order.acceptorNickname || "用户" + order.acceptorId }}
+                    <el-icon :size="12"><ChatDotRound /></el-icon>
+                  </span>
+                </div>
+                <div
+                  class="order-users"
+                  v-if="
+                    order.publisherCancel === 1 || order.acceptorCancel === 1
+                  "
+                >
+                  <el-tag type="warning" size="small">等待对方确认取消</el-tag>
+                </div>
+              </div>
+              <div class="order-actions" v-if="order.orderStatus === 0">
+                <el-button
+                  type="danger"
+                  size="small"
+                  @click="handleCancelOrder(order.id)"
+                  >放弃</el-button
+                >
               </div>
             </div>
             <el-empty
@@ -91,7 +148,7 @@
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :lg="12">
+      <el-col :xs="24" :lg="8">
         <el-card class="section-card" shadow="hover">
           <template #header>
             <div class="card-header">
@@ -120,12 +177,83 @@
                   >
                     {{ getOrderStatusText(order.orderStatus) }}
                   </el-tag>
+                  <span
+                    v-if="order.requireTime && order.orderStatus === 1"
+                    class="order-countdown"
+                  >
+                    <el-icon :size="12"><Clock /></el-icon>
+                    {{ getCountdown(order.requireTime) }}
+                  </span>
                 </div>
+                <div class="order-users">
+                  <span class="user-label">发布人：</span>
+                  <span
+                    class="user-name"
+                    @click="goToChat(order.userId!, order.publisherNickname)"
+                  >
+                    {{ order.publisherNickname || "用户" + order.userId }}
+                    <el-icon :size="12"><ChatDotRound /></el-icon>
+                  </span>
+                </div>
+                <div
+                  class="order-users"
+                  v-if="
+                    order.publisherCancel === 1 || order.acceptorCancel === 1
+                  "
+                >
+                  <el-tag type="warning" size="small">等待对方确认取消</el-tag>
+                </div>
+              </div>
+              <div class="order-actions" v-if="order.orderStatus === 1">
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="handleCompleteOrder(order.id)"
+                  >完成</el-button
+                >
               </div>
             </div>
             <el-empty
               v-if="myAcceptedOrders.length === 0"
               description="暂无接受的订单"
+              :image-size="80"
+            />
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :lg="8">
+        <el-card class="section-card" shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span class="card-header-title">我发起的帖子</span>
+              <el-button type="primary" link size="small" @click="goToOrders"
+                >查看全部</el-button
+              >
+            </div>
+          </template>
+          <div class="my-posts">
+            <div
+              v-for="post in myPosts"
+              :key="post.id"
+              class="post-item"
+              @click="goToPostDetail(post.id)"
+            >
+              <div class="post-icon">
+                <el-icon :size="24"><ChatDotRound /></el-icon>
+              </div>
+              <div class="post-content">
+                <div class="post-title">{{ post.title || "帖子" }}</div>
+                <div class="post-meta">
+                  <span class="post-time">{{
+                    formatTime(post.createTime)
+                  }}</span>
+                </div>
+              </div>
+            </div>
+            <el-empty
+              v-if="myPosts.length === 0"
+              description="暂无发起的帖子"
               :image-size="80"
             />
           </div>
@@ -138,8 +266,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { Clock, Sunny, Star, Document } from "@element-plus/icons-vue";
-import { getOrderPage, type Order } from "@/api/order";
+import { Document, Money, ChatDotRound, Clock } from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  getOrderPage,
+  getUserStatistics,
+  getMyPublishedOrders,
+  getMyAcceptedOrders,
+  cancelOrderByUser,
+  completeOrder,
+  type Order,
+  type UserStatistics,
+} from "@/api/order";
+import { getMyPosts, type Post } from "@/api/post";
 
 const router = useRouter();
 
@@ -147,7 +286,15 @@ const currentTime = ref("");
 const timer = ref<any>(null);
 const myPublishedOrders = ref<Order[]>([]);
 const myAcceptedOrders = ref<Order[]>([]);
+const myPosts = ref<Post[]>([]);
 const loading = ref(false);
+const userStats = ref<UserStatistics>({
+  orderCount: 0,
+  totalAmount: 0,
+  postCount: 0,
+});
+
+const acceptedOrderCount = ref(0);
 
 const updateTime = () => {
   const now = new Date();
@@ -189,6 +336,14 @@ const getOrderStatusType = (status: number | undefined) => {
   return map[status || 0] || "info";
 };
 
+const formatTime = (time: string | undefined) => {
+  if (!time) return "";
+  const date = new Date(time);
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${month}-${day}`;
+};
+
 const getOrderStatusText = (status: number | undefined) => {
   const map: Record<number, string> = {
     0: "待接单",
@@ -202,59 +357,31 @@ const getOrderStatusText = (status: number | undefined) => {
 const loadMyOrders = async () => {
   loading.value = true;
   try {
-    const res = await getOrderPage({ page: 1, pageSize: 10 });
-    if (res?.code === 200 && res?.data?.records) {
-      const allOrders = res.data.records;
-      myPublishedOrders.value = allOrders.slice(0, 5);
-      myAcceptedOrders.value = allOrders.slice(0, 5);
-    } else {
-      myPublishedOrders.value = [
-        {
-          id: 1,
-          requirement: "帮我取个快递",
-          orderAmount: 10,
-          orderStatus: 0,
-        },
-        {
-          id: 2,
-          requirement: "打印一份资料",
-          orderAmount: 5,
-          orderStatus: 2,
-        },
-      ];
-      myAcceptedOrders.value = [
-        {
-          id: 3,
-          requirement: "食堂带饭",
-          orderAmount: 8,
-          orderStatus: 1,
-        },
-      ];
+    const [publishedRes, acceptedRes, postsRes, statsRes] = await Promise.all([
+      getMyPublishedOrders(),
+      getMyAcceptedOrders(),
+      getMyPosts(),
+      getUserStatistics(),
+    ]);
+
+    if (publishedRes?.code === 200 && publishedRes?.data) {
+      myPublishedOrders.value = publishedRes.data;
+    }
+
+    if (acceptedRes?.code === 200 && acceptedRes?.data) {
+      myAcceptedOrders.value = acceptedRes.data;
+    }
+
+    if (postsRes?.code === 200 && postsRes?.data) {
+      myPosts.value = postsRes.data;
+    }
+
+    if (statsRes?.code === 200 && statsRes?.data) {
+      userStats.value = statsRes.data;
+      acceptedOrderCount.value = statsRes.data.acceptedOrderCount || 0;
     }
   } catch (err) {
-    console.error("加载订单失败:", err);
-    myPublishedOrders.value = [
-      {
-        id: 1,
-        requirement: "帮我取个快递",
-        orderAmount: 10,
-        orderStatus: 0,
-      },
-      {
-        id: 2,
-        requirement: "打印一份资料",
-        orderAmount: 5,
-        orderStatus: 2,
-      },
-    ];
-    myAcceptedOrders.value = [
-      {
-        id: 3,
-        requirement: "食堂带饭",
-        orderAmount: 8,
-        orderStatus: 1,
-      },
-    ];
+    console.error("加载数据失败:", err);
   } finally {
     loading.value = false;
   }
@@ -262,6 +389,81 @@ const loadMyOrders = async () => {
 
 const goToOrders = () => {
   router.push("/user/orders");
+};
+
+const goToPostDetail = (postId: number) => {
+  router.push(`/user/posts/${postId}`);
+};
+
+const goToChat = (userId: number, nickname?: string) => {
+  router.push({
+    path: `/user/chat/${userId}`,
+    query: { nickname: nickname || "" },
+  });
+};
+
+const getCountdown = (requireTime: string) => {
+  if (!requireTime) return "";
+  const now = new Date().getTime();
+  const target = new Date(requireTime).getTime();
+  const diff = target - now;
+
+  if (diff <= 0) return "已超时";
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `${days}天${hours % 24}小时`;
+  }
+  return `${hours}小时${minutes}分钟`;
+};
+
+const handleCancelOrder = async (orderId: number) => {
+  try {
+    await ElMessageBox.confirm("确定要放弃该订单吗？", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+
+    const res = await cancelOrderByUser(orderId);
+    if (res?.code === 200) {
+      ElMessage.success("订单已放弃");
+      loadMyOrders();
+    } else {
+      ElMessage.error(res?.msg || "操作失败");
+    }
+  } catch (err) {
+    if (err !== "cancel") {
+      console.error("放弃订单失败:", err);
+      ElMessage.error("操作失败");
+    }
+  }
+};
+
+const handleCompleteOrder = async (orderId: number) => {
+  try {
+    await ElMessageBox.confirm("确定要完成该订单吗？", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "success",
+    });
+
+    const res = await completeOrder(orderId);
+    if (res?.code === 200) {
+      ElMessage.success("订单已完成");
+      loadMyOrders();
+    } else {
+      ElMessage.error(res?.msg || "操作失败");
+    }
+  } catch (err) {
+    if (err !== "cancel") {
+      console.error("完成订单失败:", err);
+      ElMessage.error("操作失败");
+    }
+  }
 };
 
 onMounted(() => {
@@ -307,7 +509,7 @@ onUnmounted(() => {
 }
 
 .time-card,
-.weather-card {
+.stat-card {
   height: 100%;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -333,7 +535,7 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.time-icon {
+.card-icon.order-icon {
   background: linear-gradient(
     135deg,
     rgba(64, 158, 255, 0.1),
@@ -342,7 +544,16 @@ onUnmounted(() => {
   color: #409eff;
 }
 
-.weather-icon {
+.card-icon.accept-icon {
+  background: linear-gradient(
+    135deg,
+    rgba(103, 194, 58, 0.1),
+    rgba(103, 194, 58, 0.2)
+  );
+  color: #67c23a;
+}
+
+.card-icon.post-icon {
   background: linear-gradient(
     135deg,
     rgba(230, 162, 60, 0.1),
@@ -374,7 +585,7 @@ onUnmounted(() => {
   color: #606266;
 }
 
-.weather-temp {
+.card-value {
   font-size: 24px;
   font-weight: 700;
   color: #303133;
@@ -458,6 +669,67 @@ onUnmounted(() => {
   padding: 0 20px;
 }
 
+.my-posts {
+  padding: 0 20px;
+}
+
+.post-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #ebeef5;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f7fa;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.post-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    rgba(230, 162, 60, 0.1),
+    rgba(230, 162, 60, 0.2)
+  );
+  color: #e6a23c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.post-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #303133;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-meta {
+  margin-top: 4px;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #909399;
+}
+
 .order-item {
   display: flex;
   align-items: center;
@@ -514,6 +786,48 @@ onUnmounted(() => {
   font-size: 16px;
   font-weight: 600;
   color: #f56c6c;
+}
+
+.order-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: 12px;
+  color: #e6a23c;
+  background: rgba(230, 162, 60, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.order-users {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.user-label {
+  color: #909399;
+}
+
+.user-name {
+  color: #409eff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.user-name:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {

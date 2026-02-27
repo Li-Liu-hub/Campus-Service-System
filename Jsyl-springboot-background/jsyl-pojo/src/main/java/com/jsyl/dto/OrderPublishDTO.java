@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -37,4 +38,14 @@ public class OrderPublishDTO {
      * 订单金额
      */
     private BigDecimal orderAmount;
+
+    /**
+     * 校区ID
+     */
+    private Integer campusId;
+
+    /**
+     * 订单要求完成时间
+     */
+    private LocalDateTime requireTime;
 }

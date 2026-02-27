@@ -1,76 +1,65 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsyl.mapper.OrderCenterMapper">
 
-    <select id="pageQuery" resultType="com.jsyl.entity.Order">
-        select 
-            o.id,
-            o.order_no as orderNo,
-            o.user_id as userId,
-            o.acceptor_id as acceptorId,
-            o.service_address as serviceAddress,
-            o.requirement,
-            o.contact_phone as contactPhone,
-            o.order_amount as orderAmount,
-            o.order_status as orderStatus,
-            o.type_id as typeId,
-            o.create_time as createTime,
-            u.nickname as publisherNickname
-        from order_info o
-        left join user_info u on o.user_id = u.id
-        <where>
+    <select id="pageQuery" resultType="com.jsyl.entity.Order"> select o.id, o.order_no as orderNo,
+        o.user_id as userId, o.acceptor_id as acceptorId, o.service_address as serviceAddress,
+        o.requirement, o.contact_phone as contactPhone, o.order_amount as orderAmount,
+        o.order_status as orderStatus, o.type_id as typeId, o.create_time as createTime, u.nickname
+        as publisherNickname from order_info o left join user_info u on o.user_id = u.id <where>
             <!-- 默认只显示未接单的订单 -->
-            <if test="orderStatus == null">
-                and o.order_status = 0
-            </if>
-            <if test="orderNo != null and orderNo != ''">
-                and o.order_no like concat('%', #{orderNo}, '%')
-            </if>
-            <if test="typeId != null and typeId !=0" >
-                and o.type_id = #{typeId}
-            </if>
-            <if test="orderStatus != null">
-                and o.order_status = #{orderStatus}
-            </if>
-            <if test="userId != null">
-                and o.user_id = #{userId}
-            </if>
+            <if
+                test="orderStatus == null"> and o.order_status = 0 </if>
+            <if
+                test="orderNo != null and orderNo != ''"> and o.order_no like concat('%',
+        #{orderNo}, '%') </if>
+            <if test="typeId != null and typeId !=0"> and o.type_id = #{typeId} </if>
+            <if
+                test="orderStatus != null"> and o.order_status = #{orderStatus} </if>
+            <if
+                test="userId != null"> and o.user_id = #{userId} </if>
             <if test="acceptorId != null">
-                and o.acceptor_id = #{acceptorId}
-            </if>
-            <if test="userName != null and userName != ''">
-                and u.nickname like concat('%', #{userName}, '%')
-            </if>
-        </where>
-        order by o.create_time desc
-    </select>
+        and o.acceptor_id = #{acceptorId} </if>
+            <if test="userName != null and userName != ''"> and
+        u.nickname like concat('%', #{userName}, '%') </if>
+            <if test="campusId != null"> and
+        o.campus_id = #{campusId} </if>
+        </where> order by o.create_time desc </select>
 
-    <insert id="insert" parameterType="com.jsyl.entity.Order" useGeneratedKeys="true" keyProperty="id">
-        insert into order_info (order_no, user_id, acceptor_id, service_address, requirement,
-                               contact_phone, order_amount, order_status, type_id, create_time)
+    <insert id="insert" parameterType="com.jsyl.entity.Order" useGeneratedKeys="true"
+        keyProperty="id"> insert into order_info (order_no, user_id, acceptor_id, service_address,
+        requirement, contact_phone, order_amount, order_status, type_id, create_time, campus_id)
         values (#{orderNo}, #{userId}, #{acceptorId}, #{serviceAddress}, #{requirement},
-                #{contactPhone}, #{orderAmount}, #{orderStatus}, #{typeId}, #{createTime})
-    </insert>
+        #{contactPhone}, #{orderAmount}, #{orderStatus}, #{typeId}, #{createTime}, #{campusId}) </insert>
 
-    <select id="getById" resultType="com.jsyl.entity.Order">
-        select * from order_info where id = #{id}
-    </select>
+    <select id="getById" resultType="com.jsyl.entity.Order"> select * from order_info where id =
+        #{id} </select>
 
-    <update id="update" parameterType="com.jsyl.entity.Order">
-        update order_info
-        <set>
+    <update id="update" parameterType="com.jsyl.entity.Order"> update order_info <set>
             <if test="orderNo != null">order_no = #{orderNo},</if>
-            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userId != null">user_id
+        = #{userId},</if>
             <if test="acceptorId != null">acceptor_id = #{acceptorId},</if>
-            <if test="serviceAddress != null">service_address = #{serviceAddress},</if>
-            <if test="requirement != null">requirement = #{requirement},</if>
-            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
-            <if test="orderAmount != null">order_amount = #{orderAmount},</if>
-            <if test="orderStatus != null">order_status = #{orderStatus},</if>
-            <if test="typeId != null">type_id = #{typeId},</if>
+            <if
+                test="serviceAddress != null">service_address = #{serviceAddress},</if>
+            <if
+                test="requirement != null">requirement = #{requirement},</if>
+            <if
+                test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if
+                test="orderAmount != null">order_amount = #{orderAmount},</if>
+            <if
+                test="orderStatus != null">order_status = #{orderStatus},</if>
+            <if
+                test="typeId != null">type_id = #{typeId},</if>
+            <if test="requireTime != null">require_time
+        = #{requireTime},</if>
+            <if test="completeTime != null">complete_time = #{completeTime},</if>
+            <if
+                test="publisherCancel != null">publisher_cancel = #{publisherCancel},</if>
+            <if
+                test="acceptorCancel != null">acceptor_cancel = #{acceptorCancel},</if>
         </set>
-        where id = #{id}
-    </update>
+        where id = #{id} </update>
 
 </mapper>

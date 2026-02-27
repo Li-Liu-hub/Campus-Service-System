@@ -342,8 +342,8 @@ const handleCurrentChange = (val: number) => {
 const handleViewDetail = (row: Post) => {
   currentPost.value = row;
   postForm.value = {
-    title: row.title,
-    content: row.content,
+    title: row.title || "",
+    content: row.content || "",
   };
   isEdit.value = false;
   isAdd.value = false;
@@ -353,8 +353,8 @@ const handleViewDetail = (row: Post) => {
 const handleEditPost = (row: Post) => {
   currentPost.value = row;
   postForm.value = {
-    title: row.title,
-    content: row.content,
+    title: row.title || "",
+    content: row.content || "",
   };
   isEdit.value = true;
   isAdd.value = false;

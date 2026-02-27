@@ -269,6 +269,17 @@
           />
           <span style="margin-left: 8px; color: #909399">元</span>
         </el-form-item>
+        <el-form-item label="要求完成时间" prop="requireTime">
+          <el-date-picker
+            v-model="publishForm.requireTime"
+            type="datetime"
+            placeholder="选择要求完成时间"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+            :shortcuts="shortcuts"
+            style="width: 100%"
+          />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -345,6 +356,7 @@ const publishForm = ref({
   contactPhone: "",
   requirement: "",
   orderAmount: undefined as number | undefined,
+  requireTime: "",
 });
 
 const publishRules: FormRules = {
@@ -363,6 +375,58 @@ const publishRules: FormRules = {
   requirement: [{ required: true, message: "请输入需求描述", trigger: "blur" }],
   orderAmount: [{ required: true, message: "请输入订单酬金", trigger: "blur" }],
 };
+
+const shortcuts = [
+  {
+    text: "1小时后",
+    value: () => {
+      const date = new Date();
+      date.setHours(date.getHours() + 1);
+      return date;
+    },
+  },
+  {
+    text: "3小时后",
+    value: () => {
+      const date = new Date();
+      date.setHours(date.getHours() + 3);
+      return date;
+    },
+  },
+  {
+    text: "今天中午前",
+    value: () => {
+      const date = new Date();
+      date.setHours(12, 0, 0, 0);
+      return date;
+    },
+  },
+  {
+    text: "明天中午前",
+    value: () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 1);
+      date.setHours(12, 0, 0, 0);
+      return date;
+    },
+  },
+  {
+    text: "3天内",
+    value: () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 3);
+      return date;
+    },
+  },
+  {
+    text: "7天内",
+    value: () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+      return date;
+    },
+  },
+];
 
 const filteredOrders = computed(() => {
   if (!filterForm.value.typeId) {
@@ -548,6 +612,7 @@ const handleSubmitPublish = async (): Promise<void> => {
           contactPhone: publishForm.value.contactPhone,
           requirement: publishForm.value.requirement,
           orderAmount: publishForm.value.orderAmount!,
+          requireTime: publishForm.value.requireTime || undefined,
         });
 
         ElMessage.success("订单发布成功！");

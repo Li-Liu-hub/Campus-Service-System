@@ -356,7 +356,8 @@ const orderStats = computed(() => {
   ];
 });
 
-const formatAmount = (amount: number): string => {
+const formatAmount = (amount: number | undefined): string => {
+  if (amount === undefined) return "0.00";
   return amount.toFixed(2);
 };
 
@@ -376,17 +377,20 @@ const formatTime = (timeArr: number[] | string | undefined): string => {
   return "-";
 };
 
-const getStatusText = (status: number): string => {
+const getStatusText = (status: number | undefined): string => {
+  if (status === undefined) return "未知状态";
   return ORDER_STATUS_TEXT[status] || "未知状态";
 };
 
-const getTypeText = (typeId: number): string => {
+const getTypeText = (typeId: number | undefined): string => {
+  if (typeId === undefined) return "未知类型";
   return ORDER_TYPE_TEXT[typeId] || "未知类型";
 };
 
 const getStatusTagType = (
-  status: number
+  status: number | undefined
 ): "success" | "primary" | "warning" | "info" | "danger" => {
+  if (status === undefined) return "info";
   const typeMap: Record<
     number,
     "success" | "primary" | "warning" | "info" | "danger"
@@ -403,11 +407,11 @@ const getRowClassName = ({ rowIndex }: { rowIndex: number }) => {
   return rowIndex % 2 === 0 ? "even-row" : "odd-row";
 };
 
-const canAccept = (status: number): boolean => {
+const canAccept = (status: number | undefined): boolean => {
   return status === OrderStatus.PENDING_ACCEPT;
 };
 
-const canComplete = (status: number): boolean => {
+const canComplete = (status: number | undefined): boolean => {
   return status === OrderStatus.ACCEPTED;
 };
 

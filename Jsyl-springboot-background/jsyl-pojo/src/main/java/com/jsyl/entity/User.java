@@ -40,6 +40,10 @@ public class User implements Serializable {
      */
     private String phone;
 
+    /**
+     * 校区ID
+     */
+    private Integer campusId;
 
     /**
      * 用户权限：0-普通用户 1-管理员
@@ -47,8 +51,23 @@ public class User implements Serializable {
     private Integer permission;
 
     /**
+     * 用户角色：0-被限制, 1-普通用户, 2-VIP, 3-管理员, 4-超级管理员
+     */
+    private Integer role;
+
+    /**
      * 用户收货地址
      */
     private String address;
+
+    /**
+     * 创建时间
+     */
+    private String createdAt;
+
+    /**
+     * 账户余额
+     */
+    private Double accountBalance;
 
 }

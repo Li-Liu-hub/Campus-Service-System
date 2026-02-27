@@ -49,6 +49,20 @@ export type OrderType = typeof OrderType[keyof typeof OrderType];
 // ==================== 接口定义 ====================
 
 /**
+ * 用户统计接口
+ */
+export interface UserStatistics {
+  /** 发起订单数 */
+  orderCount?: number;
+  /** 接受订单数 */
+  acceptCount?: number;
+  /** 发布帖子数 */
+  postCount?: number;
+  /** 消费总额 */
+  totalAmount?: number;
+}
+
+/**
  * 订单实体接口
  */
 export interface Order {

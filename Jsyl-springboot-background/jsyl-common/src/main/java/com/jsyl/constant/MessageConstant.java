@@ -52,5 +52,7 @@ public class MessageConstant {
     public static final String PASSWORD_CHANGED_SUCCESS = "密码修改成功";
     public static final String ORDER_PUBLISHED_SUCCESS = "订单发布成功";
     public static final String ORDER_ACCEPTED_SUCCESS = "接单成功";
+    public static final String ORDER_CANCELLED_SUCCESS = "订单取消成功";
+    public static final String ORDER_COMPLETED_SUCCESS = "订单完成成功";
 
 }

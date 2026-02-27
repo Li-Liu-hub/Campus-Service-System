@@ -1,4 +1,4 @@
-import { get, post } from '@/utils/request';
+import { get, post, put } from '@/utils/request';
 import { API_ORDER_PAGE } from '@/constants/api';
 
 export interface OrderPageQueryParams {
@@ -23,6 +23,12 @@ export interface Order {
   createTime?: number[] | string;
   userId?: number;
   acceptorId?: number;
+  publisherNickname?: string;
+  acceptorNickname?: string;
+  requireTime?: string;
+  completeTime?: string;
+  publisherCancel?: number;
+  acceptorCancel?: number;
 }
 
 export interface OrderPageResponse {
@@ -36,6 +42,7 @@ export interface PublishOrderParams {
   contactPhone: string;
   requirement: string;
   orderAmount: number;
+  requireTime?: string;
 }
 
 export interface OrderDetailVO {
@@ -56,7 +63,7 @@ export interface OrderDetailVO {
 
 export const ORDER_STATUS_TEXT: Record<number, string> = {
   0: '待接单',
-  1: '已接单',
+  1: '进行中',
   2: '已完成',
   3: '已取消',
 };
@@ -91,4 +98,35 @@ export function acceptOrder(orderId: number) {
 
 export function getOrderDetail(id: number) {
   return get<OrderDetailVO>(`/jsyl/home/orderCenter/detail/${id}`);
+}
+
+export interface UserStatistics {
+  orderCount: number;
+  totalAmount: number;
+  postCount: number;
+  acceptedOrderCount: number;
+}
+
+export function getUserStatistics() {
+  return get<UserStatistics>('/jsyl/home/orderCenter/statistics');
+}
+
+export function getMyPublishedOrders() {
+  return get<Order[]>('/jsyl/home/orderCenter/myPublished');
+}
+
+export function getMyAcceptedOrders() {
+  return get<Order[]>('/jsyl/home/orderCenter/myAccepted');
+}
+
+export function getTransactionHistory() {
+  return get<Order[]>('/jsyl/home/orderCenter/transactions');
+}
+
+export function cancelOrderByUser(orderId: number) {
+  return put<string>(`/jsyl/home/orderCenter/cancelByUser/${orderId}`);
+}
+
+export function completeOrder(orderId: number) {
+  return put<string>(`/jsyl/home/orderCenter/complete/${orderId}`);
 }

@@ -8,18 +8,6 @@
             <div class="login-subtitle">账号登录</div>
           </div>
         </template>
-        <div class="role-selector">
-          <el-radio-group v-model="loginRole" size="large">
-            <el-radio-button value="user">
-              <el-icon><User /></el-icon>
-              用户
-            </el-radio-button>
-            <el-radio-button value="admin">
-              <el-icon><Setting /></el-icon>
-              管理员
-            </el-radio-button>
-          </el-radio-group>
-        </div>
         <el-form
           class="login-form"
           :model="loginForm"
@@ -94,7 +82,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { User, Lock, Setting } from "@element-plus/icons-vue";
+import { User, Lock } from "@element-plus/icons-vue";
 
 import { login, type LoginParams, type LoginApiParams } from "@/api/auth";
 
@@ -115,7 +103,6 @@ const loginForm = ref<LoginParams>({
   remember: false,
 });
 
-const loginRole = ref<"user" | "admin">("user");
 const isLoading = ref(false);
 
 // ==================== 登录处理 ====================
@@ -200,7 +187,8 @@ const handleLoginSuccess = (
   console.log("Token:", token);
   console.log("Account:", account);
   console.log("用户数据:", userData);
-  console.log("当前角色:", loginRole.value);
+  const userRole = userData?.role || 1;
+  console.log("用户角色:", userRole);
 
   localStorage.setItem(TOKEN_KEY, token);
 
@@ -209,6 +197,7 @@ const handleLoginSuccess = (
       id: userData.id,
       account: userData.account,
       nickname: userData.nickname || account,
+      role: userRole,
     };
     localStorage.setItem("userInfo", JSON.stringify(userInfo));
     console.log("已保存用户信息到localStorage:", userInfo);
@@ -222,8 +211,7 @@ const handleLoginSuccess = (
 
   ElMessage.success("登录成功！");
 
-  const targetPath =
-    loginRole.value === "admin" ? ADMIN_HOME_PATH : USER_HOME_PATH;
+  const targetPath = userRole === 4 ? ADMIN_HOME_PATH : USER_HOME_PATH;
   console.log("准备跳转到:", targetPath);
 
   router

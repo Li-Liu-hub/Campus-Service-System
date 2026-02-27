@@ -19,6 +19,11 @@ export default defineConfig({
         changeOrigin: true,
         ws: true,
       },
+      "/admin": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
   resolve: {

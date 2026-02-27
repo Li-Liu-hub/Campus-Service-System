@@ -51,8 +51,8 @@
           </div>
           <div class="messages-list" ref="messagesListRef">
             <div
-              v-for="msg in messages"
-              :key="msg.id || msg.createTime"
+              v-for="(msg, index) in messages"
+              :key="(msg as any).id || (msg as any).createTime || index"
               class="message-item"
               :class="{ 'message-self': isCurrentUser((msg as any).senderId!) }"
             >

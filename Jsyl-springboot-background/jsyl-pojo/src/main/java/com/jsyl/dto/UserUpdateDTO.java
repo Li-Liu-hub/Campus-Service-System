@@ -19,4 +19,6 @@ public class UserUpdateDTO implements Serializable {
 
     private String phone;
 
+    private Integer campusId;
+
 }

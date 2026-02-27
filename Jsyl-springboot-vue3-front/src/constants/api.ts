@@ -11,9 +11,13 @@ export const API_BASE_URL = '/jsyl';
 
 /** 公共API路径 */
 export const API_COMMON_PATH = `${API_BASE_URL}/common`;
+export const API_CAMPUS_LIST = `${API_COMMON_PATH}/campusList`;
 
 /** 首页功能API路径 */
 export const API_HOME_PATH = `${API_BASE_URL}/home`;
+
+/** 管理员API路径 */
+export const API_ADMIN_PATH = `/admin`;
 
 // ==================== 认证相关API ====================
 
@@ -76,6 +80,9 @@ export const API_ORDER_ACCEPT = `${API_ORDER_CENTER_PATH}/accept`;
 
 /** 获取订单详情API路径 */
 export const API_ORDER_DETAIL = `${API_ORDER_CENTER_PATH}/detail`;
+export const API_ORDER_STATISTICS = `${API_ORDER_CENTER_PATH}/statistics`;
+export const API_ORDER_MY_PUBLISHED = `${API_ORDER_CENTER_PATH}/myPublished`;
+export const API_ORDER_MY_ACCEPTED = `${API_ORDER_CENTER_PATH}/myAccepted`;
 
 // ==================== 帖子相关API ====================
 
@@ -96,6 +103,7 @@ export const API_POST_DELETE = `${API_POST_PATH}/delete`;
 
 /** 分页查询帖子API路径 */
 export const API_POST_PAGE = `${API_POST_PATH}/page`;
+export const API_POST_MY_POSTS = `${API_POST_PATH}/myPosts`;
 
 // ==================== 评论相关API ====================
 
@@ -144,6 +152,32 @@ export const API_CONVERSATION_READ = `${API_CONVERSATION_PATH}/read`;
 
 /** 获取未读消息数量API路径 */
 export const API_CONVERSATION_UNREAD_COUNT = `${API_CONVERSATION_PATH}/unread/count`;
+
+// ==================== 管理员用户相关API ====================
+
+/** 管理员获取用户列表API路径 */
+export const API_ADMIN_USER_LIST = `${API_ADMIN_PATH}/user/list`;
+
+/** 管理员获取用户详情API路径 */
+export const API_ADMIN_USER_DETAIL = `${API_ADMIN_PATH}/user`;
+
+/** 管理员修改用户角色API路径 */
+export const API_ADMIN_USER_ROLE = `${API_ADMIN_PATH}/user/role`;
+
+/** 管理员修改用户状态API路径 */
+export const API_ADMIN_USER_STATUS = `${API_ADMIN_PATH}/user/status`;
+
+/** 管理员获取订单列表API路径 */
+export const API_ADMIN_ORDER_PAGE = `${API_BASE_URL}/home/orderCenter/page`;
+
+/** 管理员获取帖子列表API路径 */
+export const API_ADMIN_POST_PAGE = `${API_BASE_URL}/home/post/page`;
+
+/** 管理员取消订单API路径 */
+export const API_ADMIN_ORDER_CANCEL = `${API_BASE_URL}/home/orderCenter/cancel`;
+
+/** 管理员删除帖子API路径 */
+export const API_ADMIN_POST_DELETE = `${API_BASE_URL}/home/post/delete`;
 
 // ==================== 统一导出对象 ====================
 

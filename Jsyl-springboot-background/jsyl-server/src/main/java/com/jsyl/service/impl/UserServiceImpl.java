@@ -8,6 +8,7 @@ import com.jsyl.exception.AccountAlreadyExistsException;
 import com.jsyl.exception.AccountNotFoundException;
 import com.jsyl.exception.ParameterValidationException;
 import com.jsyl.exception.PasswordErrorException;
+import com.jsyl.mapper.CampusInfoMapper;
 import com.jsyl.mapper.UserMapper;
 import com.jsyl.service.UserService;
 import com.jsyl.utils.ValidationUtil;
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -24,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CampusInfoMapper campusInfoMapper;
 
     public User Login(UserDTO userDTO) {
         User user = userMapper.Login(userDTO);
@@ -54,7 +60,8 @@ public class UserServiceImpl implements UserService {
                 .nickname(userRegisterDTO.getAccount())
                 .password(passwordEncoder.encode(userRegisterDTO.getPassword()))
                 .phone(userRegisterDTO.getPhone())
-                .permission(0)
+                .permission(1)
+                .role(1)
                 .build();
 
         userMapper.insert(user);
@@ -99,5 +106,40 @@ public class UserServiceImpl implements UserService {
             throw new ParameterValidationException(MessageConstant.PASSWORD_STRENGTH_ERROR);
         }
         userMapper.updatePassword(id, passwordEncoder.encode(newPassword));
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userMapper.getAllUsers();
+    }
+
+    @Override
+    @Transactional
+    public void updateUserRole(Integer userId, Integer role) {
+        User user = userMapper.getById(userId);
+        if (user == null) {
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        user.setRole(role);
+        userMapper.update(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateUserStatus(Integer userId, Integer status) {
+        User user = userMapper.getById(userId);
+        if (user == null) {
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        user.setPermission(status);
+        userMapper.update(user);
+    }
+
+    @Override
+    public String getCampusNameById(Integer campusId) {
+        if (campusId == null) {
+            return null;
+        }
+        return campusInfoMapper.getCampusNameById(campusId);
     }
 }

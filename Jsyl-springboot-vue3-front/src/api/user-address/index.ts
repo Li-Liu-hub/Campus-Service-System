@@ -27,8 +27,8 @@ export function addUserAddress(data: UserAddressParams) {
   return post<string>(API_USER_ADDRESS_ADD, data);
 }
 
-export function updateUserAddress(data: any) {
-  return put<string>(API_USER_ADDRESS_UPDATE, data);
+export function updateUserAddress(id: number, data: UserAddressParams) {
+  return put<string>(`${API_USER_ADDRESS_UPDATE}/${id}`, data);
 }
 
 export function deleteUserAddress(id: number) {

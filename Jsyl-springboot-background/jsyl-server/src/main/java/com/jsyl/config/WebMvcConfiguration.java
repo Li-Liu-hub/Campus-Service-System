@@ -1,6 +1,5 @@
 package com.jsyl.config;
 
-import com.jsyl.interceptor.JwtTokenAdminInterceptor;
 import com.jsyl.interceptor.JwtTokenUserInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 @Slf4j
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
-
-    @Autowired
-    private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
     @Autowired
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
@@ -53,16 +49,21 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      */
     protected void addInterceptors(InterceptorRegistry registry) {
         log.info("开始注册自定义拦截器...");
-        registry.addInterceptor(jwtTokenAdminInterceptor)
-                .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/employee/login");
 
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**")
                 .addPathPatterns("/jsyl/user/**")
+                .addPathPatterns("/jsyl/home/**")
+                .addPathPatterns("/jsyl/admin/**")
+                .addPathPatterns("/jsyl/common/**")
                 .excludePathPatterns("/user/user/login")
                 .excludePathPatterns("/jsyl/user/user/login")
-                .excludePathPatterns("/jsyl/user/register");
+                .excludePathPatterns("/jsyl/user/login")
+                .excludePathPatterns("/jsyl/user/register")
+                .excludePathPatterns("/user/login")
+                .excludePathPatterns("/jsyl/common/login")
+                .excludePathPatterns("/jsyl/common/register")
+                .excludePathPatterns("/jsyl/common/campusList");
     }
 
     /**
