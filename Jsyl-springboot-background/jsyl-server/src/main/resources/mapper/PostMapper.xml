@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsyl.mapper.PostMapper">
+
+    <select id="pageQuery" resultType="com.jsyl.entity.Post">
+        select 
+            p.id, p.user_id as userId, p.type_id as typeId, p.title, p.content, 
+            p.view_count as viewCount, p.reply_count as replyCount, 
+            p.create_time as createTime, p.update_time as updateTime,
+            u.nickname as author
+        from post_info p
+        left join user_info u on p.user_id = u.id
+        <where>
+            p.deleted_at is null
+            <if test="keyword != null and keyword != ''">
+                and p.title like concat('%', #{keyword}, '%')
+            </if>
+            <if test="userId != null">
+                and p.user_id = #{userId}
+            </if>
+        </where>
+        order by p.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.jsyl.entity.Post" useGeneratedKeys="true" keyProperty="id">
+        insert into post_info (user_id, title, content, view_count, reply_count, create_time, update_time)
+        values (#{userId}, #{title}, #{content}, #{viewCount}, #{replyCount}, #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="getById" resultType="com.jsyl.entity.Post">
+        select id, user_id as userId, title, content, view_count as viewCount, reply_count as replyCount, create_time as createTime, update_time as updateTime from post_info
+        where id = #{id} and deleted_at is null
+    </select>
+
+    <update id="update">
+        update post_info
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="replyCount != null">reply_count = #{replyCount},</if>
+            update_time = #{updateTime}
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="deleteById">
+        update post_info set deleted_at = now() where id = #{id}
+    </update>
+
+</mapper>
