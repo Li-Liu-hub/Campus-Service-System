@@ -1,4 +1,4 @@
-package com.jsyl.config;
+package com.jsyl.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.jsyl.dto.WebSocketMessageDTO;

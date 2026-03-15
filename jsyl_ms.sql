@@ -11,7 +11,7 @@
  Target Server Version : 80040 (8.0.40)
  File Encoding         : 65001
 
- Date: 06/03/2026 22:03:06
+ Date: 15/03/2026 17:59:20
 */
 
 SET NAMES utf8mb4;
@@ -234,7 +234,7 @@ CREATE TABLE `notification`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_notif_user`(`user_id` ASC, `is_read` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '消息通知表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '消息通知表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of notification
@@ -266,7 +266,7 @@ CREATE TABLE `operation_log`  (
   INDEX `idx_create_time`(`create_time` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
   CONSTRAINT `fk_log_user` FOREIGN KEY (`operator_id`) REFERENCES `user_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of operation_log
@@ -288,7 +288,7 @@ CREATE TABLE `order_evaluation`  (
   UNIQUE INDEX `uk_eval_order`(`order_id` ASC) USING BTREE,
   INDEX `idx_eval_target`(`target_user_id` ASC) USING BTREE,
   CONSTRAINT `fk_eval_order` FOREIGN KEY (`order_id`) REFERENCES `order_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单评价表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单评价表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of order_evaluation
@@ -350,7 +350,7 @@ CREATE TABLE `order_info`  (
   CONSTRAINT `fk_order_type` FOREIGN KEY (`type_id`) REFERENCES `order_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_order_user` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `ck_order_amount` CHECK (`order_amount` >= 0)
-) ENGINE = InnoDB AUTO_INCREMENT = 157 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 160 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of order_info
@@ -511,6 +511,9 @@ INSERT INTO `order_info` VALUES (153, 'ORD177174939598767FD3588', 51, 51, '四�
 INSERT INTO `order_info` VALUES (154, 'ORD1771750623097C6795873', 51, NULL, '四公寓男寝227', '1', '18104417838', 20.00, 0, 0.00, 3, 2, '2026-02-22 16:57:03', NULL, NULL, NULL, 1, 0, 0);
 INSERT INTO `order_info` VALUES (155, 'ORD1772766183238E9B82584', 54, NULL, '四公寓男寝227', '1111', '18104417838', 20.00, 0, 0.00, 3, 2, '2026-03-06 11:03:03', NULL, NULL, NULL, 2, 1, 0);
 INSERT INTO `order_info` VALUES (156, 'ORD177280123724608DCB33B', 54, NULL, '四公寓男寝227', '227', '18104417838', 20.00, 0, 0.00, 3, 2, '2026-03-06 20:47:17', NULL, NULL, NULL, 2, 0, 0);
+INSERT INTO `order_info` VALUES (157, 'ORD1772805876972BC025F31', 54, NULL, '四公寓男寝227', '替课', '18104417838', 20.00, 1, 10.00, 0, 2, '2026-03-06 22:04:37', NULL, NULL, NULL, 2, 0, 0);
+INSERT INTO `order_info` VALUES (158, 'ORD177280589092846490AE1', 54, NULL, '四公寓男寝227', '12122', '18104417838', 20.00, 0, 0.00, 0, 2, '2026-03-06 22:04:51', NULL, NULL, NULL, 2, 0, 0);
+INSERT INTO `order_info` VALUES (159, 'ORD177280590162504326410', 54, NULL, '四公寓男寝227', '11131', '18104417838', 22.00, 1, 10.00, 0, 2, '2026-03-06 22:05:02', NULL, NULL, NULL, 2, 0, 0);
 
 -- ----------------------------
 -- Table structure for order_tag
@@ -564,7 +567,7 @@ CREATE TABLE `post_image`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_img_post`(`post_id` ASC) USING BTREE,
   CONSTRAINT `fk_img_post` FOREIGN KEY (`post_id`) REFERENCES `post_info` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '帖子图片表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '帖子图片表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of post_image

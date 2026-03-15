@@ -1,5 +1,6 @@
 package com.jsyl.controller;
 
+import com.jsyl.annotation.RateLimit;
 import com.jsyl.constant.MessageConstant;
 import com.jsyl.context.BaseContext;
 import com.jsyl.dto.CommentPublishDTO;
@@ -25,6 +26,7 @@ public class CommentController {
 
     @PostMapping("/publish")
     @ApiOperation("发布评论")
+    @RateLimit(key = "rate_limit:comment:", time = 60, count = 10, message = "评论过于频繁，请60秒后再试")
     public Result<String> publish(@RequestBody CommentPublishDTO commentPublishDTO) {
         Integer userId = 2;
         try {

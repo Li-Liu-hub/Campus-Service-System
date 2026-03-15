@@ -1,4 +1,4 @@
-package com.jsyl.config;
+package com.jsyl.websocket;
 
 import com.jsyl.constant.JwtClaimsConstant;
 import com.jsyl.utils.JwtUtil;

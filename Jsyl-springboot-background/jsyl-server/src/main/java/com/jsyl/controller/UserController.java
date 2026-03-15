@@ -16,10 +16,13 @@ import com.jsyl.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/jsyl/common")
@@ -31,6 +34,16 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisObjectTemplate;
+
+    // 用户信息缓存 key
+    private static final String USER_INFO_CACHE_KEY = "user:info:";
+    // 缓存过期时间：30分钟
+    private static final long USER_INFO_CACHE_EXPIRE = 30;
+    // 延迟双删的延迟时间：500毫秒
+    private static final long DELAY_DELETE_TIME = 500;
 
     @PostMapping("/login")
     public Result<UserLoginVo> login(@RequestBody UserDTO userDTO) {
@@ -76,6 +89,16 @@ public class UserController {
         if (userId == null) {
             return Result.error("用户未登录");
         }
+
+        // 尝试从缓存获取
+        String cacheKey = USER_INFO_CACHE_KEY + userId;
+        UserVO cachedUserVO = (UserVO) redisObjectTemplate.opsForValue().get(cacheKey);
+        if (cachedUserVO != null) {
+            log.info("从缓存获取用户信息: userId={}", userId);
+            return Result.success(cachedUserVO);
+        }
+
+        // 缓存不存在，查询数据库
         User user = userService.getUserById(userId);
         if (user == null) {
             return Result.error("用户不存在");
@@ -90,6 +113,10 @@ public class UserController {
             userVO.setCampusName(campusName);
         }
 
+        // 存入缓存
+        redisObjectTemplate.opsForValue().set(cacheKey, userVO, USER_INFO_CACHE_EXPIRE, TimeUnit.MINUTES);
+        log.info("用户信息存入缓存: userId={}", userId);
+
         return Result.success(userVO);
     }
 
@@ -99,7 +126,8 @@ public class UserController {
         if (userId == null) {
             return Result.error("用户未登录");
         }
-        User user = userService.getUserById(userId.intValue());
+        Integer userIdInt = userId.intValue();
+        User user = userService.getUserById(userIdInt);
         if (user == null) {
             return Result.error("用户不存在");
         }
@@ -112,8 +140,35 @@ public class UserController {
         if (userUpdateDTO.getCampusId() != null) {
             user.setCampusId(userUpdateDTO.getCampusId());
         }
+
+        // 延迟双删策略
+        // 1. 先删除缓存
+        String cacheKey = USER_INFO_CACHE_KEY + userIdInt;
+        redisObjectTemplate.delete(cacheKey);
+        log.info("延迟双删：第一次删除缓存 userId={}", userIdInt);
+
+        // 2. 更新数据库
         userService.updateUserInfo(user);
+
+        // 3. 延迟后再次删除缓存
+        delayedDelete(cacheKey);
+
         return Result.success(MessageConstant.USER_INFO_UPDATED_SUCCESS);
+    }
+
+    /**
+     * 延迟删除缓存
+     */
+    @Async
+    public void delayedDelete(String cacheKey) {
+        try {
+            Thread.sleep(DELAY_DELETE_TIME);
+            redisObjectTemplate.delete(cacheKey);
+            log.info("延迟双删：第二次删除缓存 key={}", cacheKey);
+        } catch (InterruptedException e) {
+            log.error("延迟删除缓存失败", e);
+            Thread.currentThread().interrupt();
+        }
     }
 
     @PostMapping("/changePassword")
