@@ -1,6 +1,6 @@
 package com.jsyl.module.forum.controller;
 
-import com.jsyl.annotation.RateLimit;
+import com.jsyl.common.annotation.RateLimit;
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.context.BaseContext;
 import com.jsyl.model.forum.dto.CommentPublishDTO;

@@ -1,6 +1,6 @@
 package com.jsyl.module.trade.listener;
 
-import com.jsyl.config.RabbitMQConfig;
+import com.jsyl.common.config.RabbitMQConfig;
 import com.jsyl.model.trade.dto.SeckillMessageDTO;
 import com.jsyl.model.trade.entity.SeckillGoods;
 import com.jsyl.model.trade.entity.SeckillOrder;

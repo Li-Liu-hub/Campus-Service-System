@@ -1,8 +1,8 @@
-package com.jsyl.aspect;
+package com.jsyl.common.aspect;
 
-import com.jsyl.annotation.RateLimit;
-import com.jsyl.context.BaseContext;
-import com.jsyl.result.Result;
+import com.jsyl.common.annotation.RateLimit;
+import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.result.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -30,7 +30,7 @@ public class RateLimitAspect {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Around("@annotation(com.jsyl.annotation.RateLimit)")
+    @Around("@annotation(com.jsyl.common.annotation.RateLimit)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

@@ -1,7 +1,7 @@
-package com.jsyl.config;
+package com.jsyl.common.config;
 
-import com.jsyl.interceptor.JwtTokenAdminInterceptor;
-import com.jsyl.interceptor.JwtTokenUserInterceptor;
+import com.jsyl.common.interceptor.JwtTokenAdminInterceptor;
+import com.jsyl.common.interceptor.JwtTokenUserInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,6 @@
-package com.jsyl.annotation;
+package com.jsyl.common.annotation;
 
-import com.jsyl.enumeration.OperationType;
+import com.jsyl.common.enumeration.OperationType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

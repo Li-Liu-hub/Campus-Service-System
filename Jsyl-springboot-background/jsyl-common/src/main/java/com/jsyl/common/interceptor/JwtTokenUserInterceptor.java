@@ -1,11 +1,11 @@
-package com.jsyl.interceptor;
+package com.jsyl.common.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jsyl.constant.JwtClaimsConstant;
-import com.jsyl.context.BaseContext;
-import com.jsyl.properties.JwtProperties;
-import com.jsyl.result.Result;
-import com.jsyl.utils.JwtUtil;
+import com.jsyl.common.constant.JwtClaimsConstant;
+import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.properties.JwtProperties;
+import com.jsyl.common.result.Result;
+import com.jsyl.common.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

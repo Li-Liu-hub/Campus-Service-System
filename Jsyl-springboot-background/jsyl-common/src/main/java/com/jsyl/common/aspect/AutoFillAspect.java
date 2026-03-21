@@ -1,9 +1,9 @@
-package com.jsyl.aspect;
+package com.jsyl.common.aspect;
 
-import com.jsyl.annotation.AutoFill;
-import com.jsyl.constant.AutoFillConstant;
-import com.jsyl.context.BaseContext;
-import com.jsyl.enumeration.OperationType;
+import com.jsyl.common.annotation.AutoFill;
+import com.jsyl.common.constant.AutoFillConstant;
+import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.enumeration.OperationType;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class AutoFillAspect {
 
-    @Pointcut("execution(* com.jsyl.module..mapper.*.*(..)) && @annotation(com.jsyl.annotation.AutoFill)")
+    @Pointcut("execution(* com.jsyl.module..mapper.*.*(..)) && @annotation(com.jsyl.common.annotation.AutoFill)")
     public void autoFillPointCut(){}
 
     @Before("autoFillPointCut()")

@@ -1,7 +1,7 @@
-package com.jsyl.config;
+package com.jsyl.common.config;
 
-import com.jsyl.properties.AliOssProperties;
-import com.jsyl.utils.AliOssUtil;
+import com.jsyl.common.properties.AliOssProperties;
+import com.jsyl.common.utils.AliOssUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

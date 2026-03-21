@@ -1,8 +1,8 @@
-package com.jsyl.handler;
+package com.jsyl.common.handler;
 
-import com.jsyl.constant.MessageConstant;
-import com.jsyl.exception.BaseException;
-import com.jsyl.result.Result;
+import com.jsyl.common.constant.MessageConstant;
+import com.jsyl.common.exception.BaseException;
+import com.jsyl.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

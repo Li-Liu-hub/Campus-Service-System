@@ -1,4 +1,4 @@
-package com.jsyl.config;
+package com.jsyl.common.config;
 
 
 import lombok.extern.slf4j.Slf4j;

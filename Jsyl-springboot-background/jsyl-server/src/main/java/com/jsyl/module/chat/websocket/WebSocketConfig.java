@@ -1,4 +1,4 @@
-package com.jsyl.websocket;
+package com.jsyl.module.chat.websocket;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

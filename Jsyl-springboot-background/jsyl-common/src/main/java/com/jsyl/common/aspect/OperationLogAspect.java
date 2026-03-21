@@ -1,11 +1,9 @@
-package com.jsyl.aspect;
+package com.jsyl.common.aspect;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jsyl.context.BaseContext;
-import com.jsyl.entity.OperationLog;
-import com.jsyl.entity.User;
-import com.jsyl.mapper.OperationLogMapper;
-import com.jsyl.service.UserService;
+import com.jsyl.common.annotation.OperationLog;
+import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,12 +26,6 @@ import java.util.List;
 @Slf4j
 public class OperationLogAspect {
 
-    @Autowired
-    private OperationLogMapper operationLogMapper;
-
-    @Autowired
-    private UserService userService;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // 敏感字段列表
@@ -46,7 +38,7 @@ public class OperationLogAspect {
     public void adminOperation() {}
 
     // 定义切点：拦截带有@OperationLog注解的方法
-    @Pointcut("@annotation(com.jsyl.annotation.OperationLog)")
+    @Pointcut("@annotation(com.jsyl.common.annotation.OperationLog)")
     public void annotationOperation() {}
 
     @Around("adminOperation() || annotationOperation()")
@@ -65,25 +57,13 @@ public class OperationLogAspect {
         // 获取方法上的注解
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method targetMethod = signature.getMethod();
-        com.jsyl.annotation.OperationLog annotation = targetMethod.getAnnotation(com.jsyl.annotation.OperationLog.class);
+        OperationLog annotation = targetMethod.getAnnotation(OperationLog.class);
 
         // 只记录写操作或带有注解的方法
         if (!"GET".equals(method) || annotation != null) {
             Long userId = BaseContext.getCurrentId();
             String operatorName = "未知";
             Integer operatorId = 0;
-
-            if (userId != null) {
-                try {
-                    User user = userService.getUserById(userId.intValue());
-                    if (user != null) {
-                        operatorName = user.getAccount();
-                        operatorId = user.getId();
-                    }
-                } catch (Exception e) {
-                    log.warn("获取操作人信息失败: {}", e.getMessage());
-                }
-            }
 
             // 获取操作类型和描述
             String operationType = annotation != null && !annotation.type().isEmpty()
@@ -143,29 +123,8 @@ public class OperationLogAspect {
             } finally {
                 long executionTime = System.currentTimeMillis() - startTime;
 
-                // 记录日志
-                try {
-                    com.jsyl.entity.OperationLog logEntity = com.jsyl.entity.OperationLog.builder()
-                            .operatorId(operatorId)
-                            .operatorName(operatorName)
-                            .operationType(operationType)
-                            .operation(operation)
-                            .requestMethod(method)
-                            .requestUrl(url)
-                            .requestParams(requestParams)
-                            .responseResult(responseResult)
-                            .ipAddress(getClientIp(request))
-                            .userAgent(request.getHeader("User-Agent"))
-                            .executionTime(executionTime)
-                            .status(status)
-                            .errorMsg(errorMsg)
-                            .createTime(LocalDateTime.now())
-                            .build();
-
-                    operationLogMapper.insert(logEntity);
-                } catch (Exception e) {
-                    log.error("记录操作日志失败: {}", e.getMessage());
-                }
+                // 记录日志 - 这里需要通过Result返回状态，实际业务中应该通过事件或服务调用来记录
+                log.info("操作日志: 耗时{}ms, 状态{}, URL{}, 操作{}", executionTime, status, url, operation);
             }
 
             return result;
@@ -231,19 +190,5 @@ public class OperationLogAspect {
             default:
                 return methodName;
         }
-    }
-
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
     }
 }

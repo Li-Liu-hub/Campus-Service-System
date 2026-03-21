@@ -1,4 +1,4 @@
-package com.jsyl.annotation;
+package com.jsyl.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
