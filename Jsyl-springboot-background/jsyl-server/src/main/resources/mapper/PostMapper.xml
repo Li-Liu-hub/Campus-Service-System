@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jsyl.mapper.PostMapper">
+<mapper namespace="com.jsyl.module.forum.mapper.PostMapper">
 
-    <select id="pageQuery" resultType="com.jsyl.entity.Post">
+    <select id="pageQuery" resultType="com.jsyl.model.forum.entity.Post">
         select 
             p.id, p.user_id as userId, p.type_id as typeId, p.title, p.content, 
             p.view_count as viewCount, p.reply_count as replyCount, 
@@ -23,12 +23,12 @@
         order by p.create_time desc
     </select>
 
-    <insert id="insert" parameterType="com.jsyl.entity.Post" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.jsyl.model.forum.entity.Post" useGeneratedKeys="true" keyProperty="id">
         insert into post_info (user_id, title, content, view_count, reply_count, create_time, update_time)
         values (#{userId}, #{title}, #{content}, #{viewCount}, #{replyCount}, #{createTime}, #{updateTime})
     </insert>
 
-    <select id="getById" resultType="com.jsyl.entity.Post">
+    <select id="getById" resultType="com.jsyl.model.forum.entity.Post">
         select id, user_id as userId, title, content, view_count as viewCount, reply_count as replyCount, create_time as createTime, update_time as updateTime from post_info
         where id = #{id} and deleted_at is null
     </select>

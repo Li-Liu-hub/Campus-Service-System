@@ -29,7 +29,7 @@ spring:
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.jsyl.entity
+  type-aliases-package: com.jsyl.model.**.entity
   configuration:
     #开启驼峰命名
     map-underscore-to-camel-case: true

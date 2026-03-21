@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jsyl.mapper.OrderCenterMapper">
+<mapper namespace="com.jsyl.module.trade.mapper.OrderCenterMapper">
 
-    <select id="pageQuery" resultType="com.jsyl.entity.Order"> select o.id, o.order_no as orderNo,
+    <select id="pageQuery" resultType="com.jsyl.model.trade.entity.Order"> select o.id, o.order_no as orderNo,
         o.user_id as userId, o.acceptor_id as acceptorId, o.service_address as serviceAddress,
         o.requirement, o.contact_phone as contactPhone, o.order_amount as orderAmount,
         o.order_status as orderStatus, o.type_id as typeId, o.create_time as createTime,
@@ -27,7 +27,7 @@
         o.campus_id = #{campusId} </if>
         </where> order by o.is_seckill desc, o.create_time desc </select>
 
-    <insert id="insert" parameterType="com.jsyl.entity.Order" useGeneratedKeys="true"
+    <insert id="insert" parameterType="com.jsyl.model.trade.entity.Order" useGeneratedKeys="true"
         keyProperty="id"> insert into order_info (order_no, user_id, acceptor_id, service_address,
         requirement, contact_phone, order_amount, order_status, type_id, create_time, campus_id,
         is_seckill, seckill_fee)
@@ -35,10 +35,10 @@
         #{contactPhone}, #{orderAmount}, #{orderStatus}, #{typeId}, #{createTime}, #{campusId},
         #{isSeckill}, #{seckillFee}) </insert>
 
-    <select id="getById" resultType="com.jsyl.entity.Order"> select * from order_info where id =
+    <select id="getById" resultType="com.jsyl.model.trade.entity.Order"> select * from order_info where id =
         #{id} </select>
 
-    <update id="update" parameterType="com.jsyl.entity.Order"> update order_info <set>
+    <update id="update" parameterType="com.jsyl.model.trade.entity.Order"> update order_info <set>
             <if test="orderNo != null">order_no = #{orderNo},</if>
             <if test="userId != null">user_id
         = #{userId},</if>
