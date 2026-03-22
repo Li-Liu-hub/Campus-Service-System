@@ -107,32 +107,6 @@ public class PostServiceImpl implements PostService {
             redisObjectTemplate.opsForValue().set(cacheKey, postDetailVO, randomExpire, TimeUnit.MINUTES);
         }
         return postDetailVO;
-/*        Post post = postMapper.getById(id);
-        if (post == null) {
-            throw new PostNotFoundException(MessageConstant.POST_NOT_FOUND);
-        }*//*
-        if (postDetailVO != null) {
-            long randomExpire = CACHE_BASE_EXPIRE + (long) (Math.random() * CACHE_RANDOM_EXPIRE);
-            redisObjectTemplate.opsForValue().set(cacheKey, postDetailVO, randomExpire, TimeUnit.MINUTES);
-            log.info("帖子详情存入缓存: id={}, 过期时间={}分钟", id, randomExpire);
-        }
-
-        postMapper.incrementViewCount(id);
-
-        User author = userMapper.getById(post.getUserId());
-        UserVO authorVO = UserVO.builder()
-                .id(author.getId())
-                .account(author.getAccount())
-                .nickname(author.getNickname())
-                .phone(author.getPhone())
-                .permission(author.getRole())
-                .address(author.getAddress())
-                .build();
-
-        PostDetailVO postDetailVO = new PostDetailVO();
-        BeanUtils.copyProperties(post, postDetailVO);
-        postDetailVO.setAuthor(authorVO);
-        return postDetailVO;*/
     }
 
     @Override
@@ -170,7 +144,23 @@ public class PostServiceImpl implements PostService {
             throw new PermissionDeniedException(MessageConstant.PERMISSION_DENIED);
         }
 
+        String cacheKey = POST_DETAIL_CACHE_KEY + id;
+
+        // 1. 删数据库
         postMapper.deleteById(id);
+
+        // 2. 立即删缓存
+        redisObjectTemplate.delete(cacheKey);
+
+        // 3. 延迟再删一次缓存
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+                redisObjectTemplate.delete(cacheKey);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
     }
 
     @Override
@@ -198,8 +188,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getMyPosts(Long userId) {
-        return postMapper.getMyPosts(userId.intValue(), 5);
+    public List<Post> getMyPosts(Integer userId) {
+        return postMapper.getMyPosts(userId, 5);
     }
 
 }

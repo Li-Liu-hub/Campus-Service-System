@@ -22,6 +22,6 @@ public interface PostService {
 
     PageResult pageQuery(PostPageQueryDTO postPageQueryDTO);
 
-    List<Post> getMyPosts(Long userId);
+    List<Post> getMyPosts(Integer userId);
 
 }

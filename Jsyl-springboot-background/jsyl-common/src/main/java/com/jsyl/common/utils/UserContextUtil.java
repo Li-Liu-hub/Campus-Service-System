@@ -6,11 +6,15 @@ import com.jsyl.common.exception.UserNotLoginException;
 
 public class UserContextUtil {
 
-    public  static Integer getCurrentUerId(){
+    public static Integer getCurrentUserId(){
+        Long userIdLong = getCurrentUserIdLong();
+        return userIdLong.intValue();
+    }
+    public static Long getCurrentUserIdLong(){
         Long userIdLong = BaseContext.getCurrentId();
         if (userIdLong == null) {
             throw new UserNotLoginException(MessageConstant.USER_NOT_LOGIN);
         }
-        return userIdLong.intValue();
+        return userIdLong;
     }
 }

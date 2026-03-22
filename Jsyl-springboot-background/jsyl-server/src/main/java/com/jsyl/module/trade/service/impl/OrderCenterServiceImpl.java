@@ -72,47 +72,6 @@ public class OrderCenterServiceImpl implements OrderCenterService {
                 .build();
         orderCenterMapper.insert(order);
     }
-        /*if (orderPublishDTO.getRequirement() != null &&
-            sensitiveWordService.containsSensitiveWord(orderPublishDTO.getRequirement())) {
-            List<String> words = sensitiveWordService.getSensitiveWords(orderPublishDTO.getRequirement());
-            throw new IllegalArgumentException("订单需求包含敏感词：" + String.join(", ", words));
-        }
-
-        if (orderPublishDTO.getServiceAddress() != null &&
-            sensitiveWordService.containsSensitiveWord(orderPublishDTO.getServiceAddress())) {
-            List<String> words = sensitiveWordService.getSensitiveWords(orderPublishDTO.getServiceAddress());
-            throw new IllegalArgumentException("服务地址包含敏感词：" + String.join(", ", words));
-        }*/
-
-/*        // 处理秒杀订单
-        Integer isSeckill = orderPublishDTO.getIsSeckill();
-        if (isSeckill == null) {
-            isSeckill = 0;
-        }
-
-        // 秒杀订单额外加10元
-        BigDecimal seckillFee = BigDecimal.ZERO;
-        if (isSeckill == 1) {
-            seckillFee = new BigDecimal("10.00");
-        }*/
-
-/*        Order order = Order.builder()
-                .orderNo(generateOrderNo())
-                .typeId(orderPublishDTO.getTypeId())
-                .serviceAddress(orderPublishDTO.getServiceAddress())
-                .requirement(orderPublishDTO.getRequirement())
-                .contactPhone(orderPublishDTO.getContactPhone())
-                .orderAmount(orderPublishDTO.getOrderAmount())
-                .orderStatus(StatusConstant.ORDER_STATUS_PENDING)
-                .userId(userId)
-                .createTime(LocalDateTime.now())
-                .campusId(orderPublishDTO.getCampusId())
-                .requireTime(orderPublishDTO.getRequireTime())
-                .isSeckill(isSeckill)
-                .seckillFee(seckillFee)
-                .build();
-        orderCenterMapper.insert(order);
-    }*/
 
     @Override
     public void accept(Long orderId, Integer userId) {

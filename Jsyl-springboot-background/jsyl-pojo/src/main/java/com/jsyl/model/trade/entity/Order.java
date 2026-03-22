@@ -53,8 +53,5 @@ public class Order implements Serializable {
 
     private Integer acceptorCancel;
 
-    private Integer isSeckill;
-
-    private BigDecimal seckillFee;
 
 }

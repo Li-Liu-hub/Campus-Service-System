@@ -2,7 +2,6 @@ package com.jsyl.module.forum.controller;
 
 import com.jsyl.common.annotation.RateLimit;
 import com.jsyl.common.constant.MessageConstant;
-import com.jsyl.common.context.BaseContext;
 import com.jsyl.common.utils.UserContextUtil;
 import com.jsyl.model.forum.dto.PostPageQueryDTO;
 import com.jsyl.model.forum.dto.PostPublishDTO;
@@ -21,7 +20,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/jsyl/home/post")
@@ -44,7 +42,7 @@ public class PostController {
     @ApiOperation("发布帖子")
     @RateLimit(key = "rate_limit:post:", time = 60, count = 2, message = "发帖过于频繁，请60秒后再试")
     public Result<String> publish(@RequestBody PostPublishDTO postPublishDTO) {
-        Integer userId = UserContextUtil.getCurrentUerId();
+        Integer userId = UserContextUtil.getCurrentUserId();
         User user = userService.getUserById(userId);
         if (user.getRole() != null && user.getRole() == 0) {
             return Result.error("您的账号已被禁用，无法发布帖子");
@@ -89,7 +87,7 @@ public class PostController {
     @PutMapping("/update/{id}")
     @ApiOperation("更新帖子")
     public Result<String> update(@PathVariable Long id, @RequestBody PostPublishDTO postPublishDTO) {
-        Integer userId = UserContextUtil.getCurrentUerId();
+        Integer userId = UserContextUtil.getCurrentUserId();
         postService.update(id, postPublishDTO, userId);
         return Result.success(MessageConstant.POST_UPDATED_SUCCESS);
     }
@@ -111,7 +109,7 @@ public class PostController {
     @GetMapping("/myPosts")
     @ApiOperation("获取我发起的帖子")
     public Result<List<Post>> getMyPosts() {
-        Long userId = BaseContext.getCurrentId();
+        Integer userId = UserContextUtil.getCurrentUserId();
         List<Post> posts = postService.getMyPosts(userId);
         return Result.success(posts);
     }

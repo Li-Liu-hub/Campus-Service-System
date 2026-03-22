@@ -3,7 +3,6 @@ package com.jsyl.module.trade.controller;
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.context.BaseContext;
 import com.jsyl.common.utils.UserContextUtil;
-import com.jsyl.model.trade.dto.OrderAcceptDTO;
 import com.jsyl.model.trade.dto.OrderPageQueryDTO;
 import com.jsyl.model.trade.dto.OrderPublishDTO;
 import com.jsyl.model.trade.entity.Order;
@@ -56,22 +55,7 @@ public class OrderCenterController {
     @PostMapping("/publish")
     @ApiOperation("发布订单")
     public Result<String> publish(@RequestBody OrderPublishDTO orderPublishDTO) {
-/*        Long userIdLong = BaseContext.getCurrentId();
-        if (userIdLong == null) {
-            return Result.error("用户未登录");
-        }
-        Integer userId = userIdLong.intValue();
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            return Result.error("用户不存在");
-        }
-        if (user.getRole() != null && user.getRole() == 0) {
-            return Result.error("您的账号已被禁用，无法发布订单");
-        }
-        if (user.getCampusId() != null) {
-            orderPublishDTO.setCampusId(user.getCampusId());
-        }*/
-        Integer userId = UserContextUtil.getCurrentUerId();
+        Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.publish(orderPublishDTO, userId);
         return Result.success(MessageConstant.ORDER_PUBLISHED_SUCCESS);
     }
@@ -79,7 +63,7 @@ public class OrderCenterController {
     @PostMapping("/accept/{orderId}")
     @ApiOperation("接单")
     public Result<String> accept(@PathVariable Long orderId) {
-        Integer userId = UserContextUtil.getCurrentUerId();
+        Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.accept(orderId, userId);
         return Result.success(MessageConstant.ORDER_ACCEPTED_SUCCESS);
     }
@@ -101,11 +85,7 @@ public class OrderCenterController {
     @PutMapping("/cancelByUser/{orderId}")
     @ApiOperation("用户放弃订单")
     public Result<String> cancelByUser(@PathVariable Long orderId) {
-        Long userIdLong = BaseContext.getCurrentId();
-        if (userIdLong == null) {
-            return Result.error("用户未登录");
-        }
-        Integer userId = userIdLong.intValue();
+        Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.cancelByUser(orderId, userId);
         return Result.success(MessageConstant.ORDER_CANCELLED_SUCCESS);
     }
@@ -113,11 +93,7 @@ public class OrderCenterController {
     @PutMapping("/complete/{orderId}")
     @ApiOperation("用户完成订单")
     public Result<String> complete(@PathVariable Long orderId) {
-        Long userIdLong = BaseContext.getCurrentId();
-        if (userIdLong == null) {
-            return Result.error("用户未登录");
-        }
-        Integer userId = userIdLong.intValue();
+        Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.completeByUser(orderId, userId);
         return Result.success(MessageConstant.ORDER_COMPLETED_SUCCESS);
     }
@@ -125,7 +101,7 @@ public class OrderCenterController {
     @GetMapping("/statistics")
     @ApiOperation("获取用户统计数据")
     public Result<UserStatisticsVO> getUserStatistics() {
-        Long userId = BaseContext.getCurrentId();
+        Long userId = UserContextUtil.getCurrentUserIdLong();
         UserStatisticsVO statistics = orderCenterService.getUserStatistics(userId);
         return Result.success(statistics);
     }
@@ -133,7 +109,7 @@ public class OrderCenterController {
     @GetMapping("/myPublished")
     @ApiOperation("获取我发起的订单")
     public Result<List<Order>> getMyPublishedOrders() {
-        Long userId = BaseContext.getCurrentId();
+        Long userId = UserContextUtil.getCurrentUserIdLong();
         List<Order> orders = orderCenterService.getMyPublishedOrders(userId);
         return Result.success(orders);
     }
@@ -141,7 +117,7 @@ public class OrderCenterController {
     @GetMapping("/myAccepted")
     @ApiOperation("获取我接受的订单")
     public Result<List<Order>> getMyAcceptedOrders() {
-        Long userId = BaseContext.getCurrentId();
+        Long userId = UserContextUtil.getCurrentUserIdLong();
         List<Order> orders = orderCenterService.getMyAcceptedOrders(userId);
         return Result.success(orders);
     }
@@ -149,7 +125,7 @@ public class OrderCenterController {
     @GetMapping("/transactions")
     @ApiOperation("获取交易记录")
     public Result<List<Order>> getTransactionHistory() {
-        Long userId = BaseContext.getCurrentId();
+        Long userId = UserContextUtil.getCurrentUserIdLong();
         List<Order> transactions = orderCenterService.getTransactionHistory(userId);
         return Result.success(transactions);
     }
