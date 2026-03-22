@@ -28,5 +28,4 @@ public class OrderPublishDTO {
 
     private LocalDateTime requireTime;
 
-    private Integer isSeckill;
 }

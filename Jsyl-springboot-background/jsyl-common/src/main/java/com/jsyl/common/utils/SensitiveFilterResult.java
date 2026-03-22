@@ -1,4 +1,4 @@
-package com.jsyl.utils;
+package com.jsyl.common.utils;
 
 public class SensitiveFilterResult {
     private final String filteredText;

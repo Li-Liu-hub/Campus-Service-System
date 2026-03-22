@@ -3,6 +3,7 @@ package com.jsyl.module.forum.controller;
 import com.jsyl.common.annotation.RateLimit;
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.utils.UserContextUtil;
 import com.jsyl.model.forum.dto.PostPageQueryDTO;
 import com.jsyl.model.forum.dto.PostPublishDTO;
 import com.jsyl.model.forum.entity.Post;
@@ -37,25 +38,14 @@ public class PostController {
     @Autowired
     private RedisTemplate<String, Object> redisObjectTemplate;
 
-    private static final String POST_DETAIL_CACHE_KEY = "post:detail:";
-    // 缓存基础过期时间：30分钟
-    private static final long CACHE_BASE_EXPIRE = 30;
-    // 随机波动时间：0-10分钟
-    private static final long CACHE_RANDOM_EXPIRE = 10;
+
 
     @PostMapping("/publish")
     @ApiOperation("发布帖子")
     @RateLimit(key = "rate_limit:post:", time = 60, count = 2, message = "发帖过于频繁，请60秒后再试")
     public Result<String> publish(@RequestBody PostPublishDTO postPublishDTO) {
-        Long userIdLong = BaseContext.getCurrentId();
-        if (userIdLong == null) {
-            return Result.error("用户未登录");
-        }
-        Integer userId = userIdLong.intValue();
+        Integer userId = UserContextUtil.getCurrentUerId();
         User user = userService.getUserById(userId);
-        if (user == null) {
-            return Result.error("用户不存在");
-        }
         if (user.getRole() != null && user.getRole() == 0) {
             return Result.error("您的账号已被禁用，无法发布帖子");
         }
@@ -66,15 +56,23 @@ public class PostController {
     @GetMapping("/detail/{id}")
     @ApiOperation("获取帖子详情")
     public Result<PostDetailVO> getDetail(@PathVariable Long id) {
-        // 尝试从缓存获取
-        String cacheKey = POST_DETAIL_CACHE_KEY + id;
-        PostDetailVO cachedVO = (PostDetailVO) redisObjectTemplate.opsForValue().get(cacheKey);
+/*        // 尝试从缓存获取
+       *//*
+*/
+/* String cacheKey = POST_DETAIL_CACHE_KEY + id;
+        PostDetailVO cachedVO = (PostDetailVO) redisObjectTemplate.opsForValue().get(cacheKey);*//*
+*/
+/*
         if (cachedVO != null) {
             log.info("从缓存获取帖子详情: id={}", id);
             return Result.success(cachedVO);
-        }
+        }*//*
+
 
         // 缓存不存在，查询数据库
+        */
+/*String cacheKey = POST_DETAIL_CACHE_KEY + id;*//*
+
         PostDetailVO postDetailVO = postService.getDetail(id);
 
         // 存入缓存，添加随机过期时间（防止缓存雪崩）
@@ -83,6 +81,7 @@ public class PostController {
             redisObjectTemplate.opsForValue().set(cacheKey, postDetailVO, randomExpire, TimeUnit.MINUTES);
             log.info("帖子详情存入缓存: id={}, 过期时间={}分钟", id, randomExpire);
         }
+*/       PostDetailVO postDetailVO  =  postService.getDetail(id);
 
         return Result.success(postDetailVO);
     }
@@ -90,11 +89,7 @@ public class PostController {
     @PutMapping("/update/{id}")
     @ApiOperation("更新帖子")
     public Result<String> update(@PathVariable Long id, @RequestBody PostPublishDTO postPublishDTO) {
-        Integer userId = 2;
-        try {
-            userId = BaseContext.getCurrentId().intValue();
-        } catch (Exception e) {
-        }
+        Integer userId = UserContextUtil.getCurrentUerId();
         postService.update(id, postPublishDTO, userId);
         return Result.success(MessageConstant.POST_UPDATED_SUCCESS);
     }

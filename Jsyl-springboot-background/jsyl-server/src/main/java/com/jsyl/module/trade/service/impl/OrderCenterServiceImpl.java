@@ -4,11 +4,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.constant.StatusConstant;
+import com.jsyl.common.exception.UserNotFoundException;
 import com.jsyl.model.trade.dto.OrderPageQueryDTO;
 import com.jsyl.model.trade.dto.OrderPublishDTO;
 import com.jsyl.model.notification.entity.Notification;
 import com.jsyl.model.trade.entity.Order;
 import com.jsyl.common.exception.OrderBusinessException;
+import com.jsyl.model.user.entity.User;
 import com.jsyl.module.trade.mapper.OrderCenterMapper;
 import com.jsyl.common.result.PageResult;
 import com.jsyl.module.notification.service.NotificationService;
@@ -16,6 +18,7 @@ import com.jsyl.module.trade.service.OrderCenterService;
 import com.jsyl.module.admin.service.SensitiveWordService;
 import com.jsyl.model.trade.vo.OrderDetailVO;
 import com.jsyl.model.user.vo.UserStatisticsVO;
+import com.jsyl.module.user.mapper.UserMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,8 @@ public class OrderCenterServiceImpl implements OrderCenterService {
 
     @Autowired
     private SensitiveWordService sensitiveWordService;
+    @Autowired
+    private UserMapper userMapper;
 
     public PageResult pageQuery(OrderPageQueryDTO orderPageQueryDTO) {
         PageHelper.startPage(orderPageQueryDTO.getPage(), orderPageQueryDTO.getPageSize());
@@ -47,7 +52,27 @@ public class OrderCenterServiceImpl implements OrderCenterService {
 
     @Override
     public void publish(OrderPublishDTO orderPublishDTO, Integer userId) {
-        if (orderPublishDTO.getRequirement() != null &&
+        User user = userMapper.getById(userId);
+        if (user == null) {
+            throw new UserNotFoundException(MessageConstant.USER_NOT_FOUND);
+        }
+        Integer campusId = user.getCampusId();
+        Order order = Order.builder()
+                .orderNo(generateOrderNo())
+                .typeId(orderPublishDTO.getTypeId())
+                .serviceAddress(orderPublishDTO.getServiceAddress())
+                .requirement(orderPublishDTO.getRequirement())
+                .contactPhone(orderPublishDTO.getContactPhone())
+                .orderAmount(orderPublishDTO.getOrderAmount())
+                .orderStatus(StatusConstant.ORDER_STATUS_PENDING)
+                .userId(userId)
+                .createTime(LocalDateTime.now())
+                .campusId(campusId)
+                .requireTime(orderPublishDTO.getRequireTime())
+                .build();
+        orderCenterMapper.insert(order);
+    }
+        /*if (orderPublishDTO.getRequirement() != null &&
             sensitiveWordService.containsSensitiveWord(orderPublishDTO.getRequirement())) {
             List<String> words = sensitiveWordService.getSensitiveWords(orderPublishDTO.getRequirement());
             throw new IllegalArgumentException("订单需求包含敏感词：" + String.join(", ", words));
@@ -57,9 +82,9 @@ public class OrderCenterServiceImpl implements OrderCenterService {
             sensitiveWordService.containsSensitiveWord(orderPublishDTO.getServiceAddress())) {
             List<String> words = sensitiveWordService.getSensitiveWords(orderPublishDTO.getServiceAddress());
             throw new IllegalArgumentException("服务地址包含敏感词：" + String.join(", ", words));
-        }
+        }*/
 
-        // 处理秒杀订单
+/*        // 处理秒杀订单
         Integer isSeckill = orderPublishDTO.getIsSeckill();
         if (isSeckill == null) {
             isSeckill = 0;
@@ -69,9 +94,9 @@ public class OrderCenterServiceImpl implements OrderCenterService {
         BigDecimal seckillFee = BigDecimal.ZERO;
         if (isSeckill == 1) {
             seckillFee = new BigDecimal("10.00");
-        }
+        }*/
 
-        Order order = Order.builder()
+/*        Order order = Order.builder()
                 .orderNo(generateOrderNo())
                 .typeId(orderPublishDTO.getTypeId())
                 .serviceAddress(orderPublishDTO.getServiceAddress())
@@ -87,7 +112,7 @@ public class OrderCenterServiceImpl implements OrderCenterService {
                 .seckillFee(seckillFee)
                 .build();
         orderCenterMapper.insert(order);
-    }
+    }*/
 
     @Override
     public void accept(Long orderId, Integer userId) {

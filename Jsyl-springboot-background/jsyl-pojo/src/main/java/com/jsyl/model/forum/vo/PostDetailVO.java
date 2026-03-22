@@ -1,5 +1,6 @@
 package com.jsyl.model.forum.vo;
 
+import com.jsyl.model.user.vo.UserPostVO;
 import com.jsyl.model.user.vo.UserVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,5 @@ public class PostDetailVO {
 
     private LocalDateTime updateTime;
 
-    private UserVO author;
+    private UserPostVO author;
 }

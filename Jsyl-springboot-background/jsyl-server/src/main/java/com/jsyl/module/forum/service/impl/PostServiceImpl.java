@@ -4,12 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.exception.UserNotFoundException;
 import com.jsyl.model.forum.dto.PostPageQueryDTO;
 import com.jsyl.model.forum.dto.PostPublishDTO;
 import com.jsyl.model.forum.entity.Post;
 import com.jsyl.model.user.entity.User;
 import com.jsyl.common.exception.PermissionDeniedException;
 import com.jsyl.common.exception.PostNotFoundException;
+import com.jsyl.model.user.vo.UserPostVO;
 import com.jsyl.module.forum.mapper.PostMapper;
 import com.jsyl.module.user.mapper.UserMapper;
 import com.jsyl.common.result.PageResult;
@@ -17,14 +19,15 @@ import com.jsyl.module.forum.service.PostService;
 import com.jsyl.module.admin.service.SensitiveWordService;
 import com.jsyl.common.utils.HtmlSanitizerUtil;
 import com.jsyl.model.forum.vo.PostDetailVO;
-import com.jsyl.model.user.vo.UserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -37,6 +40,14 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private SensitiveWordService sensitiveWordService;
+
+    private static final String POST_DETAIL_CACHE_KEY = "post:detail:";
+    // 缓存基础过期时间：30分钟
+    private static final long CACHE_BASE_EXPIRE = 30;
+    // 随机波动时间：0-10分钟
+    private static final long CACHE_RANDOM_EXPIRE = 10;
+    @Autowired
+    private RedisTemplate<String, Object> redisObjectTemplate;
 
     @Override
     @Transactional
@@ -74,9 +85,36 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostDetailVO getDetail(Long id) {
-        Post post = postMapper.getById(id);
+        String cacheKey = POST_DETAIL_CACHE_KEY + id;
+        /*先去缓存中查询postDetailVO是否存在*/
+        PostDetailVO postDetailVO = (PostDetailVO) redisObjectTemplate.opsForValue().get(cacheKey);
+        if(postDetailVO ==null){
+            Post post = postMapper.getById(id);
+            if (post == null) {
+                throw new PostNotFoundException(MessageConstant.POST_NOT_FOUND);
+            }
+            postDetailVO = new PostDetailVO();
+            BeanUtils.copyProperties(post, postDetailVO);
+            Integer userId = post.getUserId();
+            User user = userMapper.getById(userId);
+            if(user == null){
+                throw new UserNotFoundException(MessageConstant.USER_NOT_FOUND);
+            }
+            UserPostVO userPostVO = new UserPostVO();
+            BeanUtils.copyProperties(user, userPostVO);
+            postDetailVO.setAuthor(userPostVO);
+            long randomExpire = CACHE_BASE_EXPIRE + (long) (Math.random() * CACHE_RANDOM_EXPIRE);
+            redisObjectTemplate.opsForValue().set(cacheKey, postDetailVO, randomExpire, TimeUnit.MINUTES);
+        }
+        return postDetailVO;
+/*        Post post = postMapper.getById(id);
         if (post == null) {
             throw new PostNotFoundException(MessageConstant.POST_NOT_FOUND);
+        }*//*
+        if (postDetailVO != null) {
+            long randomExpire = CACHE_BASE_EXPIRE + (long) (Math.random() * CACHE_RANDOM_EXPIRE);
+            redisObjectTemplate.opsForValue().set(cacheKey, postDetailVO, randomExpire, TimeUnit.MINUTES);
+            log.info("帖子详情存入缓存: id={}, 过期时间={}分钟", id, randomExpire);
         }
 
         postMapper.incrementViewCount(id);
@@ -94,8 +132,7 @@ public class PostServiceImpl implements PostService {
         PostDetailVO postDetailVO = new PostDetailVO();
         BeanUtils.copyProperties(post, postDetailVO);
         postDetailVO.setAuthor(authorVO);
-
-        return postDetailVO;
+        return postDetailVO;*/
     }
 
     @Override

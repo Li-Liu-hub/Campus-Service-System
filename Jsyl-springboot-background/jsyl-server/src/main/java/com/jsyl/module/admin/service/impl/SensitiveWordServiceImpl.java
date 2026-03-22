@@ -3,7 +3,7 @@ package com.jsyl.module.admin.service.impl;
 import com.jsyl.model.admin.entity.SensitiveWord;
 import com.jsyl.module.admin.mapper.SensitiveWordMapper;
 import com.jsyl.module.admin.service.SensitiveWordService;
-import com.jsyl.utils.SensitiveWordFilter;
+import com.jsyl.common.utils.SensitiveWordFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

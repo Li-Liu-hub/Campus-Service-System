@@ -15,7 +15,6 @@ public class UserVO {
 
     private String account;
 
-    private String username;
 
     private String nickname;
 

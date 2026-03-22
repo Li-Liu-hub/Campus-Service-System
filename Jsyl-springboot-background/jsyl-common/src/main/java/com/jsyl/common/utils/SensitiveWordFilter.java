@@ -1,4 +1,4 @@
-package com.jsyl.utils;
+package com.jsyl.common.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;

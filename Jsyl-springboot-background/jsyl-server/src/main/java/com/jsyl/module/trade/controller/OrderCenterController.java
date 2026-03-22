@@ -2,6 +2,7 @@ package com.jsyl.module.trade.controller;
 
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.context.BaseContext;
+import com.jsyl.common.utils.UserContextUtil;
 import com.jsyl.model.trade.dto.OrderAcceptDTO;
 import com.jsyl.model.trade.dto.OrderPageQueryDTO;
 import com.jsyl.model.trade.dto.OrderPublishDTO;
@@ -55,7 +56,7 @@ public class OrderCenterController {
     @PostMapping("/publish")
     @ApiOperation("发布订单")
     public Result<String> publish(@RequestBody OrderPublishDTO orderPublishDTO) {
-        Long userIdLong = BaseContext.getCurrentId();
+/*        Long userIdLong = BaseContext.getCurrentId();
         if (userIdLong == null) {
             return Result.error("用户未登录");
         }
@@ -69,7 +70,8 @@ public class OrderCenterController {
         }
         if (user.getCampusId() != null) {
             orderPublishDTO.setCampusId(user.getCampusId());
-        }
+        }*/
+        Integer userId = UserContextUtil.getCurrentUerId();
         orderCenterService.publish(orderPublishDTO, userId);
         return Result.success(MessageConstant.ORDER_PUBLISHED_SUCCESS);
     }
@@ -77,11 +79,7 @@ public class OrderCenterController {
     @PostMapping("/accept/{orderId}")
     @ApiOperation("接单")
     public Result<String> accept(@PathVariable Long orderId) {
-        Integer userId = 2;
-        try {
-            userId = BaseContext.getCurrentId().intValue();
-        } catch (Exception e) {
-        }
+        Integer userId = UserContextUtil.getCurrentUerId();
         orderCenterService.accept(orderId, userId);
         return Result.success(MessageConstant.ORDER_ACCEPTED_SUCCESS);
     }
