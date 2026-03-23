@@ -29,8 +29,6 @@ export interface Order {
   completeTime?: string;
   publisherCancel?: number;
   acceptorCancel?: number;
-  isSeckill?: number;
-  seckillFee?: number;
 }
 
 export interface OrderPageResponse {
@@ -45,7 +43,6 @@ export interface PublishOrderParams {
   requirement: string;
   orderAmount: number;
   requireTime?: string;
-  isSeckill?: number;
 }
 
 export interface OrderDetailVO {

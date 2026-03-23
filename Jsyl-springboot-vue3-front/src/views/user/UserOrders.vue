@@ -61,14 +61,11 @@
       <el-empty v-if="orders.length === 0 && !loading" description="暂无订单" />
 
       <div v-else class="cards-container">
-        <div v-for="order in filteredOrders" :key="order.id" class="order-card" :class="{ 'seckill-card': order.isSeckill === 1 }">
-          <div class="card-header" :class="{ 'seckill-header': order.isSeckill === 1 }">
+        <div v-for="order in filteredOrders" :key="order.id" class="order-card">
+          <div class="card-header">
             <div class="order-type">
               <el-icon><Document /></el-icon>
               <span>{{ getTypeText(order.typeId) }}</span>
-              <el-tag v-if="order.isSeckill === 1" type="danger" size="small" style="margin-left: 8px">
-                秒杀
-              </el-tag>
             </div>
             <el-tag :type="getStatusTagType(order.orderStatus)" size="small">
               {{ getStatusText(order.orderStatus) }}
@@ -103,9 +100,6 @@
               <span class="price-value"
                 >¥{{ formatAmount(order.orderAmount) }}</span
               >
-              <span v-if="order.isSeckill === 1" class="seckill-fee">
-                +秒杀费¥{{ formatAmount(order.seckillFee || 10) }}
-              </span>
             </div>
             <div class="order-actions">
               <el-button
@@ -275,18 +269,6 @@
           />
           <span style="margin-left: 8px; color: #909399">元</span>
         </el-form-item>
-        <el-form-item label="秒杀订单">
-          <el-switch
-            v-model="publishForm.isSeckill"
-            :active-value="1"
-            :inactive-value="0"
-            active-text="开启"
-            inactive-text="关闭"
-          />
-          <div style="margin-top: 4px; color: #909399; font-size: 12px">
-            开启后订单将置顶显示，需额外支付¥10.00秒杀费用
-          </div>
-        </el-form-item>
         <el-form-item label="要求完成时间" prop="requireTime">
           <el-date-picker
             v-model="publishForm.requireTime"
@@ -375,7 +357,6 @@ const publishForm = ref({
   requirement: "",
   orderAmount: undefined as number | undefined,
   requireTime: "",
-  isSeckill: 0,
 });
 
 const publishRules: FormRules = {
@@ -455,13 +436,6 @@ const filteredOrders = computed(() => {
       (order) => order.typeId === filterForm.value.typeId
     );
   }
-  // 秒杀订单置顶
-  result = [...result].sort((a, b) => {
-    // 秒杀订单排在前面
-    if (a.isSeckill === 1 && b.isSeckill !== 1) return -1;
-    if (a.isSeckill !== 1 && b.isSeckill === 1) return 1;
-    return 0;
-  });
   return result;
 });
 
@@ -573,14 +547,9 @@ const handleViewDetail = (order: Order): void => {
 const handleAcceptOrder = async (order: Order): Promise<void> => {
   if (!order.id) return;
 
-  // 计算实际酬金：订单金额 + 秒杀费（如果开启秒杀）
-  const seckillFee = order.isSeckill === 1 ? (order.seckillFee || 10) : 0;
-  const totalAmount = (order.orderAmount || 0) + seckillFee;
-  const seckillTip = order.isSeckill === 1 ? `\n（含秒杀费¥${seckillFee}）` : '';
-
   try {
     await ElMessageBox.confirm(
-      `确定接下此订单吗？\n订单酬金：¥${formatAmount(totalAmount)}${seckillTip}`,
+      `确定接下此订单吗？\n订单酬金：¥${formatAmount(order.orderAmount)}`,
       "接单确认",
       {
         confirmButtonText: "确定接单",
@@ -608,7 +577,6 @@ const handlePublishOrder = (): void => {
     requirement: "",
     orderAmount: undefined,
     requireTime: "",
-    isSeckill: 0,
   };
   selectedAddressId.value = null;
   loadUserAddresses();
@@ -648,11 +616,9 @@ const handleSubmitPublish = async (): Promise<void> => {
           requirement: publishForm.value.requirement,
           orderAmount: publishForm.value.orderAmount!,
           requireTime: publishForm.value.requireTime || undefined,
-          isSeckill: publishForm.value.isSeckill,
         });
 
-        const seckillMsg = publishForm.value.isSeckill === 1 ? "（秒杀订单将置顶显示）" : "";
-        ElMessage.success(`订单发布成功！${seckillMsg}`);
+        ElMessage.success("订单发布成功！");
         publishDialogVisible.value = false;
         loadOrders();
       } catch (error) {
@@ -751,15 +717,6 @@ onMounted(() => {
     transform: translateY(-4px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
-
-  &.seckill-card {
-    border: 2px solid #f56c6c;
-    box-shadow: 0 4px 16px rgba(245, 108, 108, 0.2);
-
-    &:hover {
-      box-shadow: 0 6px 24px rgba(245, 108, 108, 0.3);
-    }
-  }
 }
 
 .card-header {
@@ -769,10 +726,6 @@ onMounted(() => {
   padding: 16px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
-
-  &.seckill-header {
-    background: linear-gradient(135deg, #f56c6c 0%, #e74c3c 100%);
-  }
 }
 
 .order-type {
@@ -836,12 +789,6 @@ onMounted(() => {
     font-size: 20px;
     font-weight: 700;
     color: #f56c6c;
-  }
-
-  .seckill-fee {
-    font-size: 12px;
-    color: #f56c6c;
-    margin-left: 8px;
   }
 }
 

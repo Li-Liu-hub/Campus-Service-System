@@ -6,7 +6,7 @@
         o.user_id as userId, o.acceptor_id as acceptorId, o.service_address as serviceAddress,
         o.requirement, o.contact_phone as contactPhone, o.order_amount as orderAmount,
         o.order_status as orderStatus, o.type_id as typeId, o.create_time as createTime,
-        o.is_seckill as isSeckill, o.seckill_fee as seckillFee, u.nickname
+        u.nickname
         as publisherNickname from order_info o left join user_info u on o.user_id = u.id <where>
             <!-- 默认只显示未接单的订单 -->
             <if
@@ -25,15 +25,13 @@
         u.nickname like concat('%', #{userName}, '%') </if>
             <if test="campusId != null"> and
         o.campus_id = #{campusId} </if>
-        </where> order by o.is_seckill desc, o.create_time desc </select>
+        </where> order by o.create_time desc </select>
 
     <insert id="insert" parameterType="com.jsyl.model.trade.entity.Order" useGeneratedKeys="true"
         keyProperty="id"> insert into order_info (order_no, user_id, acceptor_id, service_address,
-        requirement, contact_phone, order_amount, order_status, type_id, create_time, campus_id,
-        is_seckill, seckill_fee)
+        requirement, contact_phone, order_amount, order_status, type_id, create_time, campus_id)
         values (#{orderNo}, #{userId}, #{acceptorId}, #{serviceAddress}, #{requirement},
-        #{contactPhone}, #{orderAmount}, #{orderStatus}, #{typeId}, #{createTime}, #{campusId},
-        #{isSeckill}, #{seckillFee}) </insert>
+        #{contactPhone}, #{orderAmount}, #{orderStatus}, #{typeId}, #{createTime}, #{campusId}) </insert>
 
     <select id="getById" resultType="com.jsyl.model.trade.entity.Order"> select * from order_info where id =
         #{id} </select>
@@ -62,11 +60,7 @@
                 test="publisherCancel != null">publisher_cancel = #{publisherCancel},</if>
             <if
                 test="acceptorCancel != null">acceptor_cancel = #{acceptorCancel},</if>
-            <if
-                test="isSeckill != null">is_seckill = #{isSeckill},</if>
-            <if
-                test="seckillFee != null">seckill_fee = #{seckillFee},</if>
         </set>
-        where id = #{id} </update>
+        where id = #{id}</update>
 
 </mapper>
