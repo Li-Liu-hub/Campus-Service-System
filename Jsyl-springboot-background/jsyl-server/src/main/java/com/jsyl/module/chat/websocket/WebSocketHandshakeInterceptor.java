@@ -1,7 +1,7 @@
 package com.jsyl.module.chat.websocket;
 
-import com.jsyl.constant.JwtClaimsConstant;
-import com.jsyl.utils.JwtUtil;
+import com.jsyl.common.constant.JwtClaimsConstant;
+import com.jsyl.common.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

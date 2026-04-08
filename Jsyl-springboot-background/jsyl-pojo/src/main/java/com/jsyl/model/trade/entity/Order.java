@@ -53,5 +53,11 @@ public class Order implements Serializable {
 
     private Integer acceptorCancel;
 
+    private LocalDateTime acceptTime;
+
+    private LocalDateTime cancelTime;
+
+    private String cancelReason;
+
 
 }

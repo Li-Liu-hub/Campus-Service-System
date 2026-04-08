@@ -211,15 +211,6 @@ const routes: AppRouteRecordRaw[] = [
         }
       },
       {
-        path: 'seckill',
-        name: 'AdminSeckill',
-        component: () => import('@/views/admin/SeckillManagement.vue'),
-        meta: {
-          title: '秒杀管理',
-          requiresAuth: true
-        }
-      },
-      {
         path: 'profile',
         name: 'AdminProfile',
         component: () => import('@/views/Profile.vue'),

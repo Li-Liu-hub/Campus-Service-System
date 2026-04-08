@@ -14,7 +14,16 @@
       "Bash(git config:*)",
       "Bash(docker rm:*)",
       "Bash(docker run:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(gh pr:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(mvn dependency:tree:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm run:*)"
     ]
   }
 }

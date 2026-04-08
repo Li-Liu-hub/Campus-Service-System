@@ -1,4 +1,4 @@
-package com.jsyl.common.constant;
+package com.jsyl.common.enumeration;
 
 public enum RoleEnum {
 

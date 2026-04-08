@@ -1,13 +1,14 @@
 package com.jsyl.module.chat.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.jsyl.dto.WebSocketMessageDTO;
-import com.jsyl.entity.Conversation;
-import com.jsyl.entity.PrivateMessage;
-import com.jsyl.entity.User;
-import com.jsyl.mapper.ConversationMapper;
-import com.jsyl.mapper.PrivateMessageMapper;
-import com.jsyl.mapper.UserMapper;
+import com.jsyl.model.chat.dto.WebSocketMessageDTO;
+import com.jsyl.model.chat.entity.Conversation;
+import com.jsyl.model.chat.entity.PrivateMessage;
+import com.jsyl.model.user.entity.User;
+import com.jsyl.module.chat.mapper.ConversationMapper;
+import com.jsyl.module.chat.mapper.PrivateMessageMapper;
+import com.jsyl.module.chat.service.ConversationService;
+import com.jsyl.module.user.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -72,73 +76,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleChatMessage(Integer senderId, Integer receiverId, String content) {
-        User sender = userMapper.getById(senderId);
-        User receiver = userMapper.getById(receiverId);
 
-        if (receiver == null) {
-            log.warn("发送消息失败：接收者不存在");
-            return;
-        }
+        PrivateMessage message = conversationService.sendMessage(senderId, receiverId, content);
 
-        LocalDateTime now = LocalDateTime.now();
-
-        Conversation senderConv = conversationMapper.getByUserIdAndTargetUserId(senderId, receiverId);
-        if (senderConv == null) {
-            senderConv = Conversation.builder()
-                    .userId(senderId)
-                    .targetUserId(receiverId)
-                    .lastMessage(content)
-                    .unreadCount(0)
-                    .createTime(now)
-                    .updateTime(now)
-                    .build();
-            conversationMapper.insert(senderConv);
-        } else {
-            senderConv.setLastMessage(content);
-            senderConv.setUpdateTime(now);
-            conversationMapper.update(senderConv);
-        }
-
-        Conversation receiverConv = conversationMapper.getByUserIdAndTargetUserId(receiverId, senderId);
-        if (receiverConv == null) {
-            receiverConv = Conversation.builder()
-                    .userId(receiverId)
-                    .targetUserId(senderId)
-                    .lastMessage(content)
-                    .unreadCount(1)
-                    .createTime(now)
-                    .updateTime(now)
-                    .build();
-            conversationMapper.insert(receiverConv);
-        } else {
-            receiverConv.setLastMessage(content);
-            receiverConv.setUnreadCount(receiverConv.getUnreadCount() + 1);
-            receiverConv.setUpdateTime(now);
-            conversationMapper.update(receiverConv);
-        }
-
-        PrivateMessage privateMessage = PrivateMessage.builder()
-                .conversationId(senderConv.getId())
-                .senderId(senderId)
-                .receiverId(receiverId)
-                .content(content)
-                .msgType(1)
-                .isRead(0)
-                .createTime(now)
-                .build();
-        privateMessageMapper.insert(privateMessage);
-
-        String senderNickname = sender != null ? sender.getNickname() : "";
-
+        // 剩下只做 WebSocket 推送
         Map<String, Object> responseMessage = new ConcurrentHashMap<>();
         responseMessage.put("type", 1);
         responseMessage.put("senderId", senderId);
-        responseMessage.put("senderNickname", senderNickname);
         responseMessage.put("receiverId", receiverId);
         responseMessage.put("content", content);
-        responseMessage.put("messageId", privateMessage.getId());
-        responseMessage.put("conversationId", senderConv.getId());
-        responseMessage.put("createTime", now.toString());
+        responseMessage.put("messageId", message.getId());
+        responseMessage.put("createTime", message.getCreateTime().toString());
 
         sendMessageToUser(receiverId, responseMessage);
         sendMessageToUser(senderId, responseMessage);

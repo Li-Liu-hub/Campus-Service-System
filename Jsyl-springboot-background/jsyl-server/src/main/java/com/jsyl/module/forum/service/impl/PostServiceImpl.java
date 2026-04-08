@@ -20,7 +20,9 @@ import com.jsyl.common.utils.HtmlSanitizerUtil;
 import com.jsyl.model.forum.vo.PostDetailVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,11 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private SensitiveWordService sensitiveWordService;
+
+    /*注入线程池*/
+    @Autowired
+    @Qualifier("cacheDeleteExecutor")
+    private ThreadPoolTaskExecutor cacheDeleteExecutor;
 
     private static final String POST_DETAIL_CACHE_KEY = "post:detail:";
     // 缓存基础过期时间：30分钟
@@ -145,21 +152,20 @@ public class PostServiceImpl implements PostService {
 
         String cacheKey = POST_DETAIL_CACHE_KEY + id;
 
-        // 1. 删数据库
         postMapper.deleteById(id);
 
-        // 2. 立即删缓存
         redisObjectTemplate.delete(cacheKey);
 
-        // 3. 延迟再删一次缓存
-        new Thread(() -> {
+        cacheDeleteExecutor.execute(() -> {
             try {
                 Thread.sleep(500);
                 redisObjectTemplate.delete(cacheKey);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }).start();
+        });
+
+
     }
 
     @Override
@@ -173,16 +179,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PageResult pageQuery(PostPageQueryDTO postPageQueryDTO) {
-        // 1. 开启分页
         PageHelper.startPage(postPageQueryDTO.getPage(), postPageQueryDTO.getPageSize());
 
-        // 2. 执行查询，先用 List 接收
         List<Post> list = postMapper.pageQuery(postPageQueryDTO);
 
-        // 3. 强制类型转换 (因为 PageHelper 返回的 List 实际上是 Page 的子类)
         Page<Post> page = (Page<Post>) list;
 
-        // 4. 封装返回结果
         return new PageResult(page.getTotal(), page.getResult());
     }
 

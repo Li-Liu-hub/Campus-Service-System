@@ -105,7 +105,7 @@ public class UserController {
         }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
-        userVO.setUsername(user.getNickname());
+        userVO.setNickname(user.getNickname());
 
         if (user.getCampusId() != null) {
             userVO.setCampusId(user.getCampusId());

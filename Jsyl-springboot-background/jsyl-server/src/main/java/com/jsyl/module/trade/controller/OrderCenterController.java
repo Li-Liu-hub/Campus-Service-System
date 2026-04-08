@@ -13,8 +13,6 @@ import com.jsyl.module.trade.service.OrderCenterService;
 import com.jsyl.module.user.service.UserService;
 import com.jsyl.model.trade.vo.OrderDetailVO;
 import com.jsyl.model.user.vo.UserStatisticsVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +22,6 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/jsyl/home/orderCenter")
-@Api(tags = "订单相关接口")
 public class OrderCenterController {
 
     @Autowired
@@ -34,7 +31,6 @@ public class OrderCenterController {
     private UserService userService;
 
     @GetMapping("/page")
-    @ApiOperation("分类分页查询")
     public Result<PageResult> page(OrderPageQueryDTO orderPageQueryDTO) {
         Long userId = BaseContext.getCurrentId();
         if (userId != null) {
@@ -53,7 +49,6 @@ public class OrderCenterController {
     }
 
     @PostMapping("/publish")
-    @ApiOperation("发布订单")
     public Result<String> publish(@RequestBody OrderPublishDTO orderPublishDTO) {
         Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.publish(orderPublishDTO, userId);
@@ -61,7 +56,6 @@ public class OrderCenterController {
     }
 
     @PostMapping("/accept/{orderId}")
-    @ApiOperation("接单")
     public Result<String> accept(@PathVariable Long orderId) {
         Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.accept(orderId, userId);
@@ -69,21 +63,18 @@ public class OrderCenterController {
     }
 
     @GetMapping("/detail/{id}")
-    @ApiOperation("获取订单详情")
     public Result<OrderDetailVO> getDetail(@PathVariable Long id) {
         OrderDetailVO orderDetailVO = orderCenterService.getDetail(id);
         return Result.success(orderDetailVO);
     }
 
     @PutMapping("/cancel/{orderId}")
-    @ApiOperation("取消订单（管理员）")
     public Result<String> cancel(@PathVariable Long orderId) {
         orderCenterService.cancelOrder(orderId);
         return Result.success(MessageConstant.ORDER_CANCELLED_SUCCESS);
     }
 
     @PutMapping("/cancelByUser/{orderId}")
-    @ApiOperation("用户放弃订单")
     public Result<String> cancelByUser(@PathVariable Long orderId) {
         Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.cancelByUser(orderId, userId);
@@ -91,7 +82,6 @@ public class OrderCenterController {
     }
 
     @PutMapping("/complete/{orderId}")
-    @ApiOperation("用户完成订单")
     public Result<String> complete(@PathVariable Long orderId) {
         Integer userId = UserContextUtil.getCurrentUserId();
         orderCenterService.completeByUser(orderId, userId);
@@ -99,7 +89,6 @@ public class OrderCenterController {
     }
 
     @GetMapping("/statistics")
-    @ApiOperation("获取用户统计数据")
     public Result<UserStatisticsVO> getUserStatistics() {
         Long userId = UserContextUtil.getCurrentUserIdLong();
         UserStatisticsVO statistics = orderCenterService.getUserStatistics(userId);
@@ -107,7 +96,6 @@ public class OrderCenterController {
     }
 
     @GetMapping("/myPublished")
-    @ApiOperation("获取我发起的订单")
     public Result<List<Order>> getMyPublishedOrders() {
         Long userId = UserContextUtil.getCurrentUserIdLong();
         List<Order> orders = orderCenterService.getMyPublishedOrders(userId);
@@ -115,7 +103,6 @@ public class OrderCenterController {
     }
 
     @GetMapping("/myAccepted")
-    @ApiOperation("获取我接受的订单")
     public Result<List<Order>> getMyAcceptedOrders() {
         Long userId = UserContextUtil.getCurrentUserIdLong();
         List<Order> orders = orderCenterService.getMyAcceptedOrders(userId);
@@ -123,7 +110,6 @@ public class OrderCenterController {
     }
 
     @GetMapping("/transactions")
-    @ApiOperation("获取交易记录")
     public Result<List<Order>> getTransactionHistory() {
         Long userId = UserContextUtil.getCurrentUserIdLong();
         List<Order> transactions = orderCenterService.getTransactionHistory(userId);

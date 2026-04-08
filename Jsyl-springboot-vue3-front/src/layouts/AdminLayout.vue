@@ -37,10 +37,6 @@
           <el-icon><Bell /></el-icon>
           <template #title>通知管理</template>
         </el-menu-item>
-        <el-menu-item index="/admin/seckill">
-          <el-icon><Lightning /></el-icon>
-          <template #title>秒杀管理</template>
-        </el-menu-item>
         <el-sub-menu index="system">
           <template #title>
             <el-icon><Setting /></el-icon>
@@ -175,7 +171,6 @@ import {
   InfoFilled,
   Warning,
   SuccessFilled,
-  Lightning,
 } from "@element-plus/icons-vue";
 
 const router = useRouter();

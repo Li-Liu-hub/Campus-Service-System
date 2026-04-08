@@ -6,8 +6,6 @@ import com.jsyl.model.chat.entity.Conversation;
 import com.jsyl.model.chat.entity.PrivateMessage;
 import com.jsyl.common.result.Result;
 import com.jsyl.module.chat.service.ConversationService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/jsyl/user/conversation")
-@Api(tags = "私聊相关接口")
 @Slf4j
 public class ConversationController {
 
@@ -24,7 +21,6 @@ public class ConversationController {
     private ConversationService conversationService;
 
     @GetMapping("/list")
-    @ApiOperation("获取会话列表")
     public Result<List<Conversation>> getConversationList() {
         Long userIdLong = BaseContext.getCurrentId();
         Integer userId = userIdLong != null ? userIdLong.intValue() : null;
@@ -33,7 +29,6 @@ public class ConversationController {
     }
 
     @GetMapping("/messages/{targetUserId}")
-    @ApiOperation("获取与指定用户的消息列表")
     public Result<List<PrivateMessage>> getMessages(@PathVariable Integer targetUserId) {
         Long userIdLong = BaseContext.getCurrentId();
         Integer userId = userIdLong != null ? userIdLong.intValue() : null;
@@ -43,7 +38,6 @@ public class ConversationController {
     }
 
     @PostMapping("/send")
-    @ApiOperation("发送消息")
     public Result<PrivateMessage> sendMessage(@RequestBody SendMessageDTO sendMessageDTO) {
         Long userIdLong = BaseContext.getCurrentId();
         Integer userId = userIdLong != null ? userIdLong.intValue() : null;
@@ -54,7 +48,6 @@ public class ConversationController {
     }
 
     @PutMapping("/read/{targetUserId}")
-    @ApiOperation("标记消息为已读")
     public Result markAsRead(@PathVariable Integer targetUserId) {
         Long userIdLong = BaseContext.getCurrentId();
         Integer userId = userIdLong != null ? userIdLong.intValue() : null;
@@ -63,7 +56,6 @@ public class ConversationController {
     }
 
     @GetMapping("/unread/count")
-    @ApiOperation("获取未读消息总数")
     public Result<Integer> getUnreadCount() {
         Long userIdLong = BaseContext.getCurrentId();
         Integer userId = userIdLong != null ? userIdLong.intValue() : null;

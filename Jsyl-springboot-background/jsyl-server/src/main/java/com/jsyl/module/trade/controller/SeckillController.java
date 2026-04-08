@@ -5,8 +5,6 @@ import com.jsyl.model.trade.entity.SeckillOrder;
 import com.jsyl.common.result.Result;
 import com.jsyl.module.trade.service.SeckillService;
 import com.jsyl.model.trade.vo.SeckillGoodsVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/jsyl/home/seckill")
-@Api(tags = "秒杀相关接口")
 @Slf4j
 public class SeckillController {
 
@@ -36,7 +33,6 @@ public class SeckillController {
     private static final long CACHE_RANDOM_EXPIRE = 10;
 
     @GetMapping("/goods")
-    @ApiOperation("获取秒杀商品列表")
     public Result<List<SeckillGoodsVO>> getGoodsList() {
         Integer userId = BaseContext.getCurrentId().intValue();
         List<SeckillGoodsVO> list = seckillService.getActiveGoodsList(userId);
@@ -44,7 +40,6 @@ public class SeckillController {
     }
 
     @GetMapping("/goods/{id}")
-    @ApiOperation("获取秒杀商品详情")
     public Result<SeckillGoodsVO> getGoodsDetail(@PathVariable Long id) {
         Integer userId = BaseContext.getCurrentId().intValue();
 
@@ -69,7 +64,6 @@ public class SeckillController {
         return Result.success(vo);
     }
     @PostMapping("/buy")
-    @ApiOperation("秒杀抢购")
     public Result<Map<String, String>> seckill(@RequestParam Long goodsId,
                                                 @RequestParam(defaultValue = "1") Integer quantity) {
         Integer userId = BaseContext.getCurrentId().intValue();
@@ -83,7 +77,6 @@ public class SeckillController {
     }
 
     @GetMapping("/orders")
-    @ApiOperation("获取我的秒杀订单")
     public Result<List<SeckillOrder>> getMyOrders() {
         Integer userId = BaseContext.getCurrentId().intValue();
         List<SeckillOrder> orders = seckillService.getUserOrders(userId);

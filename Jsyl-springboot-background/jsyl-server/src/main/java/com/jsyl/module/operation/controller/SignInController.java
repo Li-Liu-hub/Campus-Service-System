@@ -4,8 +4,6 @@ import com.jsyl.common.context.BaseContext;
 import com.jsyl.common.result.Result;
 import com.jsyl.module.operation.service.SignInService;
 import com.jsyl.model.operation.vo.SignInVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/jsyl/home/signin")
-@Api(tags = "签到相关接口")
 @Slf4j
 public class SignInController {
 
@@ -23,7 +20,6 @@ public class SignInController {
     private SignInService signInService;
 
     @PostMapping
-    @ApiOperation("每日签到")
     public Result<SignInVO> signIn() {
         Integer userId = BaseContext.getCurrentId().intValue();
         SignInVO signInVO = signInService.signIn(userId);
@@ -31,7 +27,6 @@ public class SignInController {
     }
 
     @GetMapping("/status")
-    @ApiOperation("获取签到状态")
     public Result<SignInVO> getSignInStatus() {
         Integer userId = BaseContext.getCurrentId().intValue();
         SignInVO signInVO = signInService.getSignInStatus(userId);
@@ -39,7 +34,6 @@ public class SignInController {
     }
 
     @GetMapping("/calendar")
-    @ApiOperation("获取月度签到日历")
     public Result<List<LocalDate>> getMonthSignInDates(
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month) {

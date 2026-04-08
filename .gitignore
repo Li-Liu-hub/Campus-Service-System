@@ -1,0 +1,40 @@
+# Build outputs
+Jsyl-springboot-background/target/
+Jsyl-springboot-vue3-front/dist/
+Jsyl-springboot-vue3-front/node_modules/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives and backups
+*.zip
+*.rar
+*.tar
+*.tar.gz
+*.7z
+*.bak
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Package manager locks (optional, can keep)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Local config
+*.local

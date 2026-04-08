@@ -1,12 +1,11 @@
 package com.jsyl.common.utils;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
@@ -57,17 +56,14 @@ public class JwtUtil {
             throw new IllegalArgumentException("JWT载荷（claims）不能为空！");
         }
 
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         long expMillis = System.currentTimeMillis() + ttlMillis;
         Date exp = new Date(expMillis);
 
-        JwtBuilder builder = Jwts.builder()
-                .setClaims(claims)
-                // 适配0.9.1版本的signWith方法（无Keys类）
-                .signWith(signatureAlgorithm, secretKey.getBytes(StandardCharsets.UTF_8))
-                .setExpiration(exp);
-
-        return builder.compact();
+        return Jwts.builder()
+                .claims(claims)
+                .expiration(exp)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .compact();
     }
 
     private Claims parseJWT(String secretKey, String token) {
@@ -78,11 +74,11 @@ public class JwtUtil {
         }
 
         try {
-            // 0.9.1版本使用parser()而非parserBuilder()
             return Jwts.parser()
-                    .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (Exception e) {
             throw new RuntimeException("JWT解析失败：" + e.getMessage(), e);
         }

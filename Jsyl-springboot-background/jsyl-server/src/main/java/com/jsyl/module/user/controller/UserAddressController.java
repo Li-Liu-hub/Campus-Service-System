@@ -3,8 +3,6 @@ package com.jsyl.module.user.controller;
 import com.jsyl.model.user.entity.UserAddress;
 import com.jsyl.common.result.Result;
 import com.jsyl.module.user.service.UserAddressService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/jsyl/home/userAddress")
 @Slf4j
-@Api(tags = "用户地址相关接口")
 public class UserAddressController {
 
     @Autowired
     private UserAddressService userAddressService;
 
     @PostMapping("/add")
-    @ApiOperation("添加地址")
     public Result<String> add(@RequestBody UserAddress userAddress) {
         Integer userId = 2; // 暂时使用固定用户ID
         userAddressService.add(userAddress, userId);
@@ -29,7 +25,6 @@ public class UserAddressController {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获取地址列表")
     public Result<List<UserAddress>> getList() {
         Integer userId = 2; // 暂时使用固定用户ID
         List<UserAddress> list = userAddressService.getList(userId);
@@ -37,7 +32,6 @@ public class UserAddressController {
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新地址")
     public Result<String> update(@RequestBody UserAddress userAddress) {
         Integer userId = 2; // 暂时使用固定用户ID
         userAddressService.update(userAddress, userId);
@@ -45,7 +39,6 @@ public class UserAddressController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @ApiOperation("删除地址")
     public Result<String> delete(@PathVariable Long id) {
         Integer userId = 2; // 暂时使用固定用户ID
         userAddressService.delete(id, userId);
@@ -53,7 +46,6 @@ public class UserAddressController {
     }
 
     @PostMapping("/setDefault/{id}")
-    @ApiOperation("设置默认地址")
     public Result<String> setDefault(@PathVariable Long id) {
         Integer userId = 2; // 暂时使用固定用户ID
         userAddressService.setDefault(id, userId);

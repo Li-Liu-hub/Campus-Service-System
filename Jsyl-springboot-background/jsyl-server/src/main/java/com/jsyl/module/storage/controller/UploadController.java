@@ -5,8 +5,6 @@ import com.jsyl.common.context.BaseContext;
 import com.jsyl.common.result.Result;
 import com.jsyl.module.user.service.UserService;
 import com.jsyl.common.utils.AliOssUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +18,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/jsyl/common/upload")
-@Api(tags = "文件上传接口")
 @Slf4j
 public class UploadController {
 
@@ -31,7 +28,6 @@ public class UploadController {
     private UserService userService;
 
     @PostMapping("/avatar")
-    @ApiOperation("上传用户头像")
     public Result<Map<String, String>> uploadAvatar(@RequestParam("file") MultipartFile file) {
 
         try {
@@ -82,7 +78,6 @@ public class UploadController {
     }
 
     @PostMapping("/post/image")
-    @ApiOperation("上传帖子图片")
     public Result<Map<String, String>> uploadPostImage(@RequestParam("file") MultipartFile file) {
 
         try {
@@ -130,7 +125,6 @@ public class UploadController {
     }
 
     @PostMapping("/post/images")
-    @ApiOperation("批量上传帖子图片")
     public Result<Map<String, Object>> uploadPostImages(@RequestParam("files") MultipartFile[] files) {
 
         try {
@@ -195,7 +189,6 @@ public class UploadController {
     }
 
     @PostMapping("/image")
-    @ApiOperation("通用图片上传")
     public Result<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
 
         try {

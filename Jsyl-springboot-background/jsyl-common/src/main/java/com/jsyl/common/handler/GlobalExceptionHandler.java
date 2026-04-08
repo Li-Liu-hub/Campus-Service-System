@@ -1,5 +1,9 @@
 package com.jsyl.common.handler;
 
+
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
 import com.jsyl.common.constant.MessageConstant;
 import com.jsyl.common.exception.BaseException;
 import com.jsyl.common.result.Result;
@@ -8,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -17,6 +22,15 @@ public class GlobalExceptionHandler {
     public Result exceptionHandler(BaseException ex){
         log.error("异常信息：{}", ex.getMessage());
         return Result.error(ex.getMessage());
+    }
+
+
+    @ExceptionHandler
+    public Result exceptionHandler(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("；"));
+        return Result.error(message);
     }
 
 
