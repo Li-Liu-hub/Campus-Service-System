@@ -13,11 +13,7 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    // 注入你的yml配置（管理员+用户）
-    @Value("${jsyl.jwt.admin-secret-key}")
-    private String adminSecretKey;
-    @Value("${jsyl.jwt.admin-ttl}")
-    private long adminTtl;
+    // 注入你的yml配置
     @Value("${jsyl.jwt.user-secret-key}")
     private String userSecretKey;
     @Value("${jsyl.jwt.user-ttl}")
@@ -26,23 +22,15 @@ public class JwtUtil {
     // 启动时校验配置，提前发现问题
     @PostConstruct
     public void checkConfig() {
-        validateSecretKey(adminSecretKey, "管理员");
         validateSecretKey(userSecretKey, "普通用户");
-        validateTtl(adminTtl, "管理员");
         validateTtl(userTtl, "普通用户");
     }
 
-    public String createAdminJWT(Map<String, Object> claims) {
-        return createJWT(adminSecretKey, adminTtl, claims);
-    }
 
     public String createUserJWT(Map<String, Object> claims) {
         return createJWT(userSecretKey, userTtl, claims);
     }
 
-    public Claims parseAdminJWT(String token) {
-        return parseJWT(adminSecretKey, token);
-    }
 
     public Claims parseUserJWT(String token) {
         return parseJWT(userSecretKey, token);

@@ -16,6 +16,7 @@ import com.jsyl.module.user.mapper.UserMapper;
 import com.jsyl.common.result.PageResult;
 import com.jsyl.module.forum.service.PostService;
 import com.jsyl.module.admin.service.SensitiveWordService;
+import com.jsyl.module.ai.service.AiModerationService;
 import com.jsyl.common.utils.HtmlSanitizerUtil;
 import com.jsyl.model.forum.vo.PostDetailVO;
 import org.springframework.beans.BeanUtils;
@@ -41,6 +42,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private SensitiveWordService sensitiveWordService;
+
+    @Autowired
+    private AiModerationService aiModerationService;
 
     /*注入线程池*/
     @Autowired
@@ -74,6 +78,9 @@ public class PostServiceImpl implements PostService {
             List<String> words = sensitiveWordService.getSensitiveWords(postPublishDTO.getContent());
             throw new IllegalArgumentException("内容包含敏感词：" + String.join(", ", words));
         }
+
+        // AI 语义审核（大模型，智能，第二道防线）
+        aiModerationService.moderatePost(postPublishDTO.getTitle(), postPublishDTO.getContent());
 
         Post post = Post.builder()
                 .userId(userId)

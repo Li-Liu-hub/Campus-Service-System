@@ -15,11 +15,12 @@ spring:
       max-wait: 60000
       time-between-eviction-runs-millis: 60000
       min-evictable-idle-time-millis: 300000
-  redis:
-    host: localhost
-    port: 6379
-    password: 123456
-    database: 10
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      database: 10
   servlet:
     multipart:
       max-file-size: 10MB
@@ -51,12 +52,19 @@ logging:
         service: info
         controller: info
 
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: sk-cp-zSUTrPMRFKHrKIkf0gB8vFTigfH2RnTBL_U-NlgXoJW5y2f4MOBZv0AtKWViEmHhd47oVhFNfXpgT3uNYAyQixDMPYqGNskWEorUYOr3W-5zJFoafNLoUZ4
+      model-name: MiniMax-M2.7-highspeed
+      base-url: https://api.minimaxi.com/v1
+      log-requests: true
+      log-responses: true
+      temperature: 0.0
+
 jsyl:
   jwt:
-    admin-secret-key: itcast_admin_secret_key_very_long_256bits_required
-    admin-ttl: 7200000
-    admin-token-name: token
-    user-secret-key: itheima_user_secret_key_very_long_256bits_required
+    user-secret-key: JSYL666_user_secret_key_very_long_256bits_required
     user-ttl: 7200000
     user-token-name: authentication
   alioss:

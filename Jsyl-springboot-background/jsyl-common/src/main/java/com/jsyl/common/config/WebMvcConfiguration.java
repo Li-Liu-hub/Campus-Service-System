@@ -1,6 +1,5 @@
 package com.jsyl.common.config;
 
-import com.jsyl.common.interceptor.JwtTokenAdminInterceptor;
 import com.jsyl.common.interceptor.JwtTokenUserInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Autowired
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
 
-    @Autowired
-    private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
     @Override
     protected void addCorsMappings(CorsRegistry registry) {
@@ -31,18 +28,14 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     protected void addInterceptors(InterceptorRegistry registry) {
 
-        // 管理端拦截器
-        registry.addInterceptor(jwtTokenAdminInterceptor)
-                .addPathPatterns("/admin/**")
-                .addPathPatterns("/jsyl/admin/**")
-                .excludePathPatterns("/admin/login")
-                .excludePathPatterns("/jsyl/admin/login");
 
-        // 用户端拦截器
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**")
                 .addPathPatterns("/jsyl/user/**")
                 .addPathPatterns("/jsyl/home/**")
+                .addPathPatterns("/admin/**")
+                .addPathPatterns("/jsyl/admin/**")
+                .addPathPatterns("/ai/**")
                 .excludePathPatterns("/user/user/login")
                 .excludePathPatterns("/jsyl/user/user/login")
                 .excludePathPatterns("/jsyl/user/login")
@@ -51,8 +44,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/jsyl/common/login")
                 .excludePathPatterns("/jsyl/common/register")
                 .excludePathPatterns("/jsyl/common/campusList")
-                // 排除管理员相关路径，避免被用户拦截器拦截
-                .excludePathPatterns("/admin/**")
-                .excludePathPatterns("/jsyl/admin/**");
+                // 排除 AI 测试接口，方便开发调试
+                // 排除 SpringDoc OpenAPI 文档相关路径
+                .excludePathPatterns("/v3/api-docs/**")
+                .excludePathPatterns("/swagger-ui/**")
+                .excludePathPatterns("/swagger-ui.html");
     }
 }

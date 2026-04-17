@@ -23,7 +23,11 @@
       "Bash(mvn dependency:tree:*)",
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git reset:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
